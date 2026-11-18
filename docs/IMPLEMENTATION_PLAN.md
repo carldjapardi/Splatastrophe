@@ -2,6 +2,31 @@
 
 Review draft — November 17, 2026. Assumes the December 4 deadline and $100 GPU budget in the proposal still apply. Dates are proposed checkpoints, not estimates of guaranteed research completion. This is a reviewable roadmap; implementation tasks remain open.
 
+This document is the single source of truth for project scope, architecture, decisions, milestones, budget, evaluation, and implementation status. Update it as work progresses. The [original proposal](final_proposal.md) and [illustrated proposal](final_proposal_with_images.pdf) preserve historical motivation; their dates, mockups, and aspirations do not override this plan or establish completed results.
+
+## Research and dataset context
+
+### Methods and their boundaries
+
+| Reference | Role in Splatastrophe | Boundary / integration work |
+|---|---|---|
+| [3D Gaussian Splatting (Kerbl et al., 2023)](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) | Reconstruct appearance from calibrated multiview images as anisotropic Gaussians with position, covariance, opacity, and view-dependent color. Splatfacto is the planned training implementation. | Appearance reconstruction does not supply structural parts, physical materials, or cleanly separated illumination. Validate export conventions across tools. |
+| [Differentiable Blocks World (Monnier et al., 2023)](https://arxiv.org/abs/2307.05473) · [local paper](diferetiableBlocks.pdf) | Fit a compact set of textured superquadric primitives directly to calibrated images; test whether these can guide structural grouping. | This is image-based optimization, not a pretrained semantic segmenter or a Gaussian-labeling API. Align primitives with splats and evaluate assignments against manual grouping; useful mechanical parts are not guaranteed. |
+| [PhysGaussian (Xie et al., 2024)](https://xpandora.github.io/PhysGaussian/) · [local paper](physgaussian_paper.pdf) | Use continuum mechanics / Material Point Method (MPM) to evolve Gaussian positions and shapes for offline dynamics. | Requires simulation-ready geometry/particles, scale, materials, and boundary conditions; interior filling may be needed. Group labels alone do not create joints or anchors. Browser playback and the Splatfacto adapter are separate work. |
+
+COLMAP supplies camera estimation and sparse structure, not the final splat appearance model. Foreground masks separate the landmark from its background; structural grouping separates parts within the landmark. Keep these stages distinct. For optional inverse rendering, [GS-IR](https://arxiv.org/abs/2311.16473) is a research reference for recovering geometry/material/lighting attributes, not an implemented dependency or browser plugin; see section 8A.
+
+### Candidate datasets
+
+No scene or dataset variant has been selected yet. Downloading data or citing a dataset does not establish that its cameras, masks, reference geometry, or redistribution terms meet our needs.
+
+| Source | Useful context | Selection / evaluation considerations |
+|---|---|---|
+| PhotoTourism landmark photo collections; [NeRF-W references and scene splits](https://nerf-w.github.io/) | Tourist imagery of landmarks, including Brandenburg Gate, with varied viewpoints and appearance. | Record the exact release and preprocessing: supplied COLMAP reconstructions and splits depend on the variant. Lighting changes, people, occlusions, and uneven coverage complicate training and held-out image comparisons. |
+| [Tanks and Temples](https://www.tanksandtemples.org/) | Real-scene reconstruction benchmark with high-resolution video inputs and laser-scanned reference geometry. | Choose a suitable scene and verify access to its reference data and camera estimates. Geometry evaluation against a scan requires alignment and its own metrics; PSNR/SSIM evaluate rendered images, not scan accuracy. |
+
+Use one scene at a time; the datasets are alternative scene sources, not interchangeable views of one building. Section 4 defines preparation and split policy; section 5 defines reconstruction evaluation. Keep source URLs/version, scene ID, camera provenance, split, masks, scale, attribution/terms, and preprocessing in each scene configuration. Licensed sample splats can support feasibility tests but must be distinguished from our own reconstructions and held-out results.
+
 ## 1. Define the first release
 
 Deliver an interactive website with a playground viewer and a reusable library of buildings. Visitors choose a building, orbit/zoom, select components, apply supported actions, and see it bend, sway, or respond to impact while retaining camera control. Include reset, a draggable light that updates building shading and shadows, appearance controls, and a methods/results page. One building is the first technical milestone, not the final product scope. Proposed initial catalog target: three buildings, with at least two to demonstrate that the pipeline and viewer generalize; the exact catalog size remains a scope decision. Start with one active building at a time; a simultaneous multi-building scene is a later extension.
