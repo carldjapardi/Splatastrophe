@@ -18,5 +18,6 @@ external/
 wandb/
 # Frontend build artifacts
 node_modules/
+web/src/impact/node_modules
 dist/
 .vercel/
