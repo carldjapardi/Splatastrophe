@@ -1,6 +1,6 @@
 # Local synthetic playground verification — November 18, 2026
 
-Scope: issue #6, branch `codex/synthetic-playground`. This is a synthetic interaction/lighting check. It does not measure a reconstructed building, validate structural physics, establish real-asset compatibility or satisfy the final multi-building benchmark.
+Scope: [issue #6](https://github.com/SriyaKan/Splatastrophe/issues/6), [PR #7](https://github.com/SriyaKan/Splatastrophe/pull/7), branch `codex/synthetic-playground`. The FPS sample below was recorded for implementation `beb41e2`; the subsequent URL/remount/initialization fixes do not change the render workload. This is a synthetic interaction/lighting check. It does not measure a reconstructed building, validate structural physics, establish real-asset compatibility or satisfy the final multi-building benchmark.
 
 ## Reproduce
 
@@ -38,3 +38,10 @@ Configuration: `web/public/catalog.json`; fixture: `fixtures/physics/synthetic-t
 ## Remaining limitations
 
 The light/aim markers are viewport overlays for selection; dragging is on horizontal planes, with independent height sliders. This desktop-pointer-first interface is not a touch interaction benchmark. Proxy modulation can show hard boundaries across soft Gaussian silhouettes and cannot remove captured illumination. The convex tower does not validate self-shadows inside real architectural openings. Impact uses a different block representation from bending. Final splat loading/grouping/bending/relighting/proxy adapters are intentionally deferred until the final export exists.
+
+## Review regression verification
+
+- Production preview `?mode=impact&strike=1` reaches Ready with strength 0.85, 8 broken joints and Struck yes.
+- In `?bend=0.75`, disable splats, proxy and relighting and enable the mesh; choose Reload. The in-memory remount restores mesh=false, splats=true, proxy=true, relighting=true. No captured console warnings/errors.
+- Failure-injection unit tests run the real scene factory with a mocked graphics allocation boundary: missing relighting layer creates/destroys one Application; a later splat-initialization failure destroys the Application and all owned materials. These check startup cleanup paths, not real GPU retained memory.
+- The updated suite passes 22 frontend tests plus TypeScript/production build. Python CI remains unchanged. Relevant cases are `web/test/playground.test.ts` and `web/test/scene-initialization.test.ts`.

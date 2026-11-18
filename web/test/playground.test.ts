@@ -3,12 +3,36 @@ import catalog from '../public/catalog.json';
 import { parseCatalog } from '../src/playground/catalog';
 import { createSceneLoader } from '../src/playground/loading';
 import { pointOnPlane } from '../src/playground/light';
+import { initialViewerState } from '../src/playground/initialState';
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
   const promise = new Promise<T>((done) => { resolve = done; });
   return { promise, resolve };
 }
+
+describe('viewer mount defaults', () => {
+  it('restores the documented impact strike URL while respecting supported modes', () => {
+    const params = new URLSearchParams('mode=impact&strike=1');
+    expect(initialViewerState(params, ['bend', 'impact'])).toMatchObject({
+      mode: 'impact', strike: true, strength: 0.85,
+    });
+    expect(initialViewerState(params, ['bend'])).toMatchObject({ mode: 'bend', strike: false, strength: 0 });
+    expect(initialViewerState(new URLSearchParams('mode=impact&strike=1&bend=0.9'), ['impact']).strength).toBe(0.9);
+  });
+
+  it('builds fresh display/relighting defaults on every mount and preserves explicit URL overrides', () => {
+    const previous = initialViewerState(new URLSearchParams(), ['bend']);
+    previous.splats = previous.proxy = previous.relighting = false;
+    previous.mesh = true;
+    expect(initialViewerState(new URLSearchParams(), ['bend'])).toMatchObject({
+      mesh: false, splats: true, proxy: true, relighting: true,
+    });
+    expect(initialViewerState(new URLSearchParams('mesh=1&splats=0&proxy=0'), ['bend'])).toMatchObject({
+      mesh: true, splats: false, proxy: false, relighting: true,
+    });
+  });
+});
 
 describe('synthetic catalog', () => {
   it('loads the fixture, camera, supported actions and independent light/aim defaults', () => {

@@ -4,7 +4,8 @@ import { buildTowerSplats, deformSplats, type SplatCloud } from '../deformation/
 import type { BuildingEntry, LoadedFixture, Point } from './catalog';
 import { createImpactController, type ImpactController } from '../impact/src/index';
 import { createTowerScene, type TowerEntities } from '../deformation/src/demo/scene';
-import { createLifetime, numberParam } from '../deformation/src/demo/runtime';
+import { createLifetime } from '../deformation/src/demo/runtime';
+import { initialViewerState } from './initialState';
 
 type Mode = 'bend' | 'impact';
 
@@ -46,7 +47,7 @@ export async function mountViewer(entry: BuildingEntry, fixture: LoadedFixture, 
       resetLight: required(document.querySelector<HTMLButtonElement>('#reset-light'), 'reset-light'),
     };
 
-    const params = new URLSearchParams(location.search);
+    const initial = initialViewerState(new URLSearchParams(location.search), entry.actions);
     panel.measure.disabled = false;
     panel.measurement.textContent = '';
     const eventOptions = { signal: lifetime.signal };
@@ -69,16 +70,14 @@ export async function mountViewer(entry: BuildingEntry, fixture: LoadedFixture, 
       inset: bendFixture.bend.splatInset,
     });
 
-    const initialStrength = numberParam(params, 'bend', 0);
-    const initialDirection = numberParam(params, 'dir', 25);
-    panel.strength.value = String(initialStrength);
-    panel.direction.value = String(initialDirection);
-    if (params.get('splats') === '0') panel.splats.checked = false;
-    if (params.get('mesh') === '0') panel.mesh.checked = false;
-    if (params.get('proxy') === '0') panel.proxy.checked = false;
+    panel.strength.value = String(initial.strength);
+    panel.direction.value = String(initial.direction);
+    panel.splats.checked = initial.splats;
+    panel.mesh.checked = initial.mesh;
+    panel.proxy.checked = initial.proxy;
+    panel.relighting.checked = initial.relighting;
 
-    const requestedMode = params.get('mode') === 'impact' ? 'impact' : 'bend';
-    let mode: Mode = entry.actions.includes(requestedMode) ? requestedMode : entry.actions[0];
+    let mode: Mode = initial.mode;
     let struck = false;
     let { yaw, pitch, distance } = entry.camera;
     const focus = entry.camera.target;
@@ -253,6 +252,7 @@ export async function mountViewer(entry: BuildingEntry, fixture: LoadedFixture, 
     resize();
     if (mode === 'bend') bend.setBend(strength(), direction());
     publishStrength();
+    if (initial.strike && impact) strikeUpper(impact);
 
     return lifetime;
 

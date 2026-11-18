@@ -21,7 +21,7 @@ Bend and impact are separate modes. Switching modes resets both. Orbit with the 
 
 The impact mode uses the controller in `web/src/impact/`. Both modes read `fixtures/physics/synthetic-tower.json`.
 
-Query parameters for a repeatable view: `?bend=0.75&dir=25`, `?mode=impact&strike=1`.
+Query parameters for a repeatable view: `?bend=0.75&dir=25`, `?mode=impact&strike=1`. The impact shortcut applies an initial strike at strength 0.85 unless a strength of at least 0.5 is supplied via `bend`. Display overrides include `mesh=1`, `splats=0`, and `proxy=0`. Each reload restores the URL/default checkbox state, including relighting enabled, rather than retaining the previous controls.
 
 ## API
 
