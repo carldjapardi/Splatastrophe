@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "buildings": [{
+    "id": "synthetic-tower",
+    "name": "Synthetic tower",
+    "description": "A procedural placeholder for testing the playground. Bend uses a scripted curve; impact uses a separate rigid block stack.",
+    "attribution": "Original Splatastrophe procedural fixture. No photographs or trained reconstruction.",
+    "fixture": "synthetic-tower",
+    "actions": ["bend", "impact"],
+    "camera": { "yaw": 0.7, "pitch": 0.42, "distance": 13, "target": [0, 2.5, 0] },
+    "light": { "position": [4, 6, 4], "target": [0, 2.5, 0], "intensity": 4, "color": "#fff3dc", "range": 24, "innerConeAngle": 30, "outerConeAngle": 55 }
+  }]
+}

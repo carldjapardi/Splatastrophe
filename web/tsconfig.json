@@ -22,6 +22,8 @@
     "src/deformation/src",
     "src/deformation/test",
     "src/impact/src",
-    "src/impact/test"
+    "src/impact/test",
+    "src/playground",
+    "test"
   ]
 }

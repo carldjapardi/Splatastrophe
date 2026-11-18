@@ -33,7 +33,7 @@ Known renderer gaps:
 
 The proxy is the same tapered shell, pushed out by `proxyOutset`, then deformed by the same field. It is the one shadow caster in bend mode. The visible mesh is a second copy of the field, not a second solver. The ground shadow follows the bend and sun direction.
 
-There is exactly one shadow-casting directional light with azimuth, elevation, intensity and reset controls. Its draggable sun handle pauses camera orbit during a light drag. The ambient term is a constant fill. The release spotlight, independent aim target, light color control, catalog bindings, real reconstructed assets, and self-shadow validation on a structure with recesses/openings remain unimplemented. A ground shadow and changed brightness on this convex tower do not establish the full lighting milestone.
+There is exactly one shadow-casting spotlight with separate draggable position and aim markers, independent height sliders, intensity/color, comparison and reset controls. Dragging uses horizontal planes and pauses orbit; the ambient term is a constant fill. The runtime synthetic catalog supplies the defaults. Final reconstructed assets and their loading/grouping/deformation/proxy adapters are intentionally deferred and may be redesigned for the final export. Self-shadow validation on a structure with recesses/openings remains unimplemented. A ground shadow and changed brightness on this convex tower do not establish the full lighting milestone.
 
 ## Impact
 
