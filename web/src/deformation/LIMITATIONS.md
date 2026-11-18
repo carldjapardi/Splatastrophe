@@ -25,15 +25,15 @@ If that container cannot be created, the demo falls back to oriented ellipsoid m
 
 Known renderer gaps:
 
-- These splats do not receive the proxy shadow map. PlayCanvas draws Gaussian splats in their own pass, and this demo does not implement the documented proxy-relighting transfer.
+- The demo uses PlayCanvas's official `GSplatRelighting` script: a dedicated camera renders a lit proxy and coverage mask to an offscreen texture, which modulates splat fragments in unified raster rendering. The proxy is excluded from the main visible pass. This screen-space approximation is not recovered material/normal data; it can produce sharp lighting boundaries across soft splat silhouettes and cannot remove illumination baked into a real capture. The procedural tower has no captured illumination.
 - Half-float rotation is what the default container format stores. It is enough for this coarse grid and is not a full-precision covariance texture. The demo turns canvas antialiasing off because PlayCanvas warns that Gaussian splats in a multisampled framebuffer are several times more expensive.
 - A real exported splat still needs stable IDs, scale/rotation conventions, and SH layout checked against the reconstruction exporter. That adapter is not in this prototype.
 
 ## Lighting proxy
 
-The proxy is the same tapered shell, pushed out by `proxyOutset`, then deformed by the same field. It is the one shadow caster. The visible mesh is a second copy of the field, not a second solver. The ground shadow should follow the bend.
+The proxy is the same tapered shell, pushed out by `proxyOutset`, then deformed by the same field. It is the one shadow caster in bend mode. The visible mesh is a second copy of the field, not a second solver. The ground shadow follows the bend and sun direction.
 
-This does not relight splat colors. Captured illumination, double shadows, and silhouette mismatch are problems for a later lighting pass. There is exactly one shadow-casting light. The ambient term is a constant fill so the dark side stays readable.
+There is exactly one shadow-casting directional light with azimuth, elevation, intensity and reset controls. Its draggable sun handle pauses camera orbit during a light drag. The ambient term is a constant fill. The release spotlight, independent aim target, light color control, catalog bindings, real reconstructed assets, and self-shadow validation on a structure with recesses/openings remain unimplemented. A ground shadow and changed brightness on this convex tower do not establish the full lighting milestone.
 
 ## Impact
 
@@ -46,6 +46,6 @@ Rapier simulates rigid bodies. Predefined fixed joints are removed when the impu
 ## What would make this more than a prototype
 
 - Drive the same field from a real splat export and confirm covariance in the browser against a known rigid motion.
-- Hand the proxy and the single light to the viewer shell once that scaffold exists, including splat relighting.
+- Integrate the prototype's proxy relighting into the catalog viewer and validate it on real assets, including surface shadows and silhouette mismatch.
 - Replace the scripted curve with either a checked live model or played-back PhysGaussian frames, and label which one is on screen.
 - Derive breakable connections from the same components as the bend, instead of a parallel block stack.

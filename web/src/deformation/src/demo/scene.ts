@@ -9,7 +9,9 @@ import {
   MeshInstance,
   RESOLUTION_AUTO,
   StandardMaterial,
+  Vec3,
 } from 'playcanvas';
+import { GSplatRelighting } from 'playcanvas/scripts/esm/gsplat/gsplat-relighting.mjs';
 import { quatConjugate, quatRotate, sub, type Quat, type Vec3 as Vec3Tuple } from '../math';
 import type { SplatCloud } from '../splats';
 import type { TowerMeshData } from '../towerMesh';
@@ -28,6 +30,10 @@ export interface TowerEntities {
   setMode(mode: 'bend' | 'impact'): void;
   setBendVisibility(flags: { mesh: boolean; proxy: boolean; splats: boolean }): void;
   raycastBlocks(origin: Vec3Tuple, direction: Vec3Tuple): { index: number; point: Vec3Tuple } | null;
+  dispose(): void;
+  setLight(azimuth: number, elevation: number, intensity: number): void;
+  setRelighting(enabled: boolean): void;
+  hitLight(x: number, y: number): boolean;
 }
 
 export interface BlockPrototype {
@@ -47,6 +53,12 @@ export function createTowerScene(
   const app = new Application(canvas, {
     graphicsDeviceOptions: { antialias: false },
   });
+  const materials: StandardMaterial[] = [];
+  const ownedMaterial = (color: Color, gloss: number) => {
+    const material = standard(color, gloss);
+    materials.push(material);
+    return material;
+  };
   app.setCanvasFillMode(FILLMODE_FILL_WINDOW);
   app.setCanvasResolution(RESOLUTION_AUTO);
   app.scene.ambientLight = new Color(lightSpec.ambient[0], lightSpec.ambient[1], lightSpec.ambient[2]);
@@ -59,6 +71,9 @@ export function createTowerScene(
     farClip: 80,
   });
   app.root.addChild(camera);
+  camera.addComponent('script');
+  const relighting = camera.script!.create(GSplatRelighting);
+  if (!relighting?.layer) throw new Error('PlayCanvas relighting layer was not initialized');
 
   const lightEntity = new Entity('sun');
   lightEntity.addComponent('light', {
@@ -73,12 +88,18 @@ export function createTowerScene(
   light.shadowDistance = 30;
   light.shadowBias = 0.25;
   light.normalOffsetBias = 0.12;
-  const lightDirection = unit(lightSpec.direction);
-  lightEntity.setLocalPosition(-lightDirection[0] * 12, -lightDirection[1] * 12, -lightDirection[2] * 12);
-  lightEntity.lookAt(0, 2.6, 0);
+  light.layers = [...light.layers, relighting.layer.id];
   app.root.addChild(lightEntity);
+  const lightHandleMaterial = ownedMaterial(new Color(1, 0.85, 0.3), 0);
+  lightHandleMaterial.useLighting = false;
+  lightHandleMaterial.emissive.set(1, 0.75, 0.15);
+  lightHandleMaterial.update();
+  const lightHandle = new Entity('sun-handle');
+  lightHandle.addComponent('render', { type: 'sphere', material: lightHandleMaterial, castShadows: false });
+  lightHandle.setLocalScale(0.4, 0.4, 0.4);
+  app.root.addChild(lightHandle);
 
-  const groundMaterial = standard(new Color(0.45, 0.48, 0.45), 0.15);
+  const groundMaterial = ownedMaterial(new Color(0.45, 0.48, 0.45), 0.15);
   const ground = new Entity('ground');
   ground.addComponent('render', { type: 'box', material: groundMaterial });
   ground.setLocalScale(40, 0.12, 40);
@@ -87,24 +108,22 @@ export function createTowerScene(
   if (groundInstance) groundInstance.receiveShadows = true;
   app.root.addChild(ground);
 
-  const visibleMaterial = standard(new Color(0.74, 0.66, 0.54), 0.28);
+  const visibleMaterial = ownedMaterial(new Color(0.74, 0.66, 0.54), 0.28);
   visibleMaterial.opacity = 0.55;
   visibleMaterial.blendType = BLEND_NORMAL;
   visibleMaterial.update();
   const visible = meshEntity(app, 'tower-visible', visibleMesh, visibleMaterial, false);
 
-  const proxyMaterial = standard(new Color(0.93, 0.78, 0.48), 0.4);
-  proxyMaterial.opacity = 0.22;
-  proxyMaterial.blendType = BLEND_NORMAL;
-  proxyMaterial.depthWrite = false;
+  const proxyMaterial = ownedMaterial(new Color(0.5, 0.5, 0.5), 0);
   proxyMaterial.cull = CULLFACE_NONE;
-  proxyMaterial.update();
+  relighting.configureMaterial(proxyMaterial);
   const proxy = meshEntity(app, 'tower-proxy', proxyMesh, proxyMaterial, true);
+  proxy.render!.layers = [relighting.layer.id];
 
   const blockRoot = new Entity('impact-blocks');
   const blockEntities: Entity[] = [];
   blocks.forEach((block, index) => {
-    const material = standard(index % 2 === 0 ? new Color(0.62, 0.4, 0.3) : new Color(0.78, 0.62, 0.46), 0.22);
+    const material = ownedMaterial(index % 2 === 0 ? new Color(0.62, 0.4, 0.3) : new Color(0.78, 0.62, 0.46), 0.22);
     const entity = new Entity(`block-${index}`);
     entity.addComponent('render', { type: 'box', material });
     entity.setLocalPosition(block.position[0], block.position[1], block.position[2]);
@@ -123,14 +142,43 @@ export function createTowerScene(
 
   const splatView = createSplatView(app, splats);
   app.start();
+  let disposed = false;
 
-  return {
+  const result: TowerEntities = {
     app,
     camera,
     visible,
     proxy,
     blocks: blockRoot,
     splats: splatView,
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      splatView.dispose();
+      materials.forEach((material) => material.destroy());
+      app.destroy();
+    },
+    setLight(azimuth, elevation, intensity) {
+      const yaw = azimuth * Math.PI / 180;
+      const pitch = elevation * Math.PI / 180;
+      const radius = 5;
+      const x = radius * Math.cos(pitch) * Math.sin(yaw);
+      const y = 2.6 + radius * Math.sin(pitch);
+      const z = radius * Math.cos(pitch) * Math.cos(yaw);
+      lightEntity.setLocalPosition(x, y, z);
+      lightEntity.lookAt(0, 2.6, 0);
+      // PlayCanvas lights emit along local -Y; lookAt points local -Z.
+      lightEntity.rotateLocal(90, 0, 0);
+      light.intensity = intensity;
+      lightHandle.setLocalPosition(x, y, z);
+    },
+    setRelighting(enabled) {
+      relighting.blend = enabled ? 1 : 0;
+    },
+    hitLight(x, y) {
+      const position = camera.camera!.worldToScreen(lightHandle.getPosition(), new Vec3());
+      return position.z > 0 && Math.hypot(position.x - x, position.y - y) < 22;
+    },
     uploadTower(mesh, proxySource) {
       replaceMesh(visible, mesh);
       replaceMesh(proxy, proxySource);
@@ -179,6 +227,7 @@ export function createTowerScene(
       return bestIndex < 0 ? null : { index: bestIndex, point: bestPoint };
     },
   };
+  return result;
 }
 
 function meshEntity(
@@ -219,12 +268,6 @@ function standard(diffuse: Color, gloss: number): StandardMaterial {
   material.metalness = 0;
   material.update();
   return material;
-}
-
-function unit(value: Vec3Tuple): Vec3Tuple {
-  const len = Math.hypot(value[0], value[1], value[2]);
-  if (len < 1e-8) return [0, -1, 0];
-  return [value[0] / len, value[1] / len, value[2] / len];
 }
 
 function rayBox(

@@ -9,3 +9,7 @@ The [implementation plan](docs/IMPLEMENTATION_PLAN.md) is the single source of t
 ## Start reconstruction development
 
 Open `Splatastrophe.code-workspace` in VS Code and follow [the development guide](docs/DEVELOPMENT.md). The [starter notebook](notebooks/00_runtime_setup.ipynb) supports VS Code/Thunder and Colab. GPU experiments have not yet been run.
+
+## Run the synthetic viewer
+
+With Node 22.12+ on Node 22, or Node 24/26+, run `cd web`, `npm ci`, then `npm run dev`. Run `npm run check` for frontend tests, TypeScript checks and a production build. See [the prototype guide](web/src/deformation/README.md) for controls and limitations. This procedural example is separate from the reconstruction pipeline.

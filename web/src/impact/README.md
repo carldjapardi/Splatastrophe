@@ -4,12 +4,12 @@ Rigid-body impact for the synthetic tower. The block stack, joints, and solver s
 
 ## Run
 
-The demo harness is the bend package, which imports this module:
+The demo harness imports this module. From the repository root:
 
 ```bash
-cd web/src/deformation
-npm install
-npm test
+cd web
+npm ci
+npm run check
 npm run dev
 ```
 

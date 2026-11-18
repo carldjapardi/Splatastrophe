@@ -4,13 +4,24 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
+    "noUnusedLocals": true,
     "noEmit": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM"],
-    "types": ["vite/client"]
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "types": [
+      "vite/client"
+    ]
   },
-  "include": ["src", "test", "../impact/src", "../impact/test"]
+  "include": [
+    "src/deformation/src",
+    "src/deformation/test",
+    "src/impact/src",
+    "src/impact/test"
+  ]
 }

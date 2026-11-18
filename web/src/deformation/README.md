@@ -6,15 +6,16 @@ The controller is a reusable module. The Vite demo in this folder is a standalon
 
 ## Run
 
-From this directory:
+From the repository root (Node 22.12+ on the Node 22 release line, or Node 24/26+):
 
 ```bash
-npm install
-npm test
+cd web
+npm ci
+npm run check
 npm run dev
 ```
 
-`npm install` links `web/src/impact/node_modules` at this package so the impact module resolves Rapier. `npm run dev` listens on `0.0.0.0` and `$PORT` when that variable is set, otherwise port 5173.
+The shared package and lockfile live in `web/`; bend and impact resolve dependencies from `web/node_modules` without install hooks or sibling symlinks. `npm run check` runs both prototypes' tests, TypeScript checks, and the production build (`web/dist/`). `npm run dev` listens on `0.0.0.0` and `$PORT` when that variable is set, otherwise port 5173. Add `-- --host 127.0.0.1` to restrict the server to this computer.
 
 Bend and impact are separate modes. Switching modes resets both. Orbit with the pointer, zoom with the wheel, and use the strength and direction sliders. Keys: `B` bend, `I` impact, `R` reset.
 
@@ -38,6 +39,8 @@ Coordinates are right-handed, Y-up, meters.
 
 ## What the demo shows
 
-One tapered tower and one shadow-casting directional light. The opaque-translucent shell is the visible geometry. A slightly larger shell is the lighting proxy: it uses the same field, and it is the shadow caster. Procedural Gaussians update center, rotation, and scale together. The HUD prints the tip quaternion and axial scale so a center-only update is obvious.
+One tapered tower and one shadow-casting directional light. The translucent shell is optional visible geometry. A slightly larger shell uses the same deformation field and renders only into PlayCanvas's offscreen relighting layer; it also casts shadows. The official `GSplatRelighting` script transfers that proxy lighting to the procedural Gaussians. Hide visible geometry to inspect splat lighting independently. Toggle **Relight splats** for an original/relit comparison, drag the gold sun to change its azimuth/elevation without orbiting the camera, and use the intensity/reset controls. This is a directional-sun feasibility test, not the release spotlight/aim interface.
+
+Procedural Gaussians update center, rotation, and scale together. The HUD prints the tip quaternion, axial scale, and a two-second average FPS. Diagnostics refresh at 4 Hz. Navigation and hot module replacement release demo listeners, physics, custom materials, and splat resources; late physics initialization is disposed if the page has already been torn down.
 
 See [LIMITATIONS.md](LIMITATIONS.md).

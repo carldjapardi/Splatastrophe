@@ -1,5 +1,5 @@
 {
-  "name": "splatastrophe-deformation",
+  "name": "splatastrophe-web",
   "private": true,
   "type": "module",
   "scripts": {
@@ -7,7 +7,7 @@
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "preview": "vite preview --host 0.0.0.0",
-    "postinstall": "ln -sfn ../deformation/node_modules ../impact/node_modules"
+    "check": "npm test && npm run build"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.21.0",
@@ -17,5 +17,8 @@
     "typescript": "^5.9.3",
     "vite": "^8.3.8",
     "vitest": "^5.1.0"
+  },
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
   }
 }
