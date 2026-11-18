@@ -32,6 +32,8 @@ export interface TowerEntities {
 
 export interface BlockPrototype {
   halfExtents: Vec3Tuple;
+  position: Vec3Tuple;
+  rotation: Quat;
 }
 
 export function createTowerScene(
@@ -105,6 +107,8 @@ export function createTowerScene(
     const material = standard(index % 2 === 0 ? new Color(0.62, 0.4, 0.3) : new Color(0.78, 0.62, 0.46), 0.22);
     const entity = new Entity(`block-${index}`);
     entity.addComponent('render', { type: 'box', material });
+    entity.setLocalPosition(block.position[0], block.position[1], block.position[2]);
+    entity.setLocalRotation(block.rotation[0], block.rotation[1], block.rotation[2], block.rotation[3]);
     entity.setLocalScale(block.halfExtents[0] * 2, block.halfExtents[1] * 2, block.halfExtents[2] * 2);
     const instance = entity.render?.meshInstances[0];
     if (instance) {

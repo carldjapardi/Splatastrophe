@@ -50,6 +50,7 @@ if (params.get('proxy') === '0') panel.proxy.checked = false;
 
 let mode: Mode = params.get('mode') === 'impact' ? 'impact' : 'bend';
 let impact: ImpactController | null = null;
+let impactError: string | null = null;
 let struck = false;
 let yaw = 0.7;
 let pitch = 0.42;
@@ -62,7 +63,11 @@ const scene = createTowerScene(
   visibleMesh,
   proxyMesh,
   cloud,
-  impactFixture.bodies.map((body) => ({ halfExtents: body.halfExtents })),
+  impactFixture.bodies.map((body) => ({
+    halfExtents: body.halfExtents,
+    position: body.position,
+    rotation: body.rotation,
+  })),
   bendFixture.light,
 );
 
@@ -97,6 +102,7 @@ for (const box of [panel.mesh, panel.proxy, panel.splats]) {
   });
 }
 panel.reset.addEventListener('click', () => resetActive());
+panel.strike.disabled = true;
 panel.strike.addEventListener('click', () => {
   if (impact) strikeUpper(impact);
 });
@@ -137,6 +143,8 @@ window.addEventListener('resize', () => scene.app.resizeCanvas());
 
 void createImpactController(impactFixture).then((controller) => {
   impact = controller;
+  impactError = null;
+  panel.strike.disabled = false;
   syncBlocks(controller);
   if (params.get('strike') === '1') {
     if (strength() < 0.5) panel.strength.value = '0.85';
@@ -144,8 +152,9 @@ void createImpactController(impactFixture).then((controller) => {
     strikeUpper(controller);
   }
 }).catch((error: unknown) => {
-  const message = error instanceof Error ? error.message : String(error);
-  if (panel.readout) panel.readout.textContent = `Impact solver failed: ${message}`;
+  impact = null;
+  impactError = error instanceof Error ? error.message : String(error);
+  panel.strike.disabled = true;
 });
 
 if (mode === 'bend') bend.setBend(strength(), direction());
@@ -276,7 +285,7 @@ function writeReadout(controller: BendController, splats: SplatCloud, tower: Tow
     ['Tip quat', rotation.map((value) => value.toFixed(3)).join(' ')],
     ['Tip scale Y', scaleY.toFixed(3)],
     ['Splats', tower.splats.kind],
-    ['Joints broken', impactController ? `${broken}` : 'loading'],
+    ['Joints broken', impactError ? `solver failed: ${impactError}` : impactController ? `${broken}` : 'loading'],
     ['Struck', struck ? 'yes' : 'no'],
   ];
   panel.readout.replaceChildren();
