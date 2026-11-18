@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Synthetic tower — bend and impact</title>
+    <link rel="stylesheet" href="/src/demo/style.css" />
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+    <aside id="panel">
+      <p class="kicker">Splatastrophe prototype</p>
+      <h1>Synthetic tower</h1>
+      <p class="limit">Scripted bending and breakable rigid bodies. Not validated structural physics and not a PhysGaussian result.</p>
+      <div class="row" role="group" aria-label="Mode">
+        <button id="mode-bend" type="button" class="active">Bend</button>
+        <button id="mode-impact" type="button">Impact</button>
+      </div>
+      <label>Strength <output id="strength-value">0.00</output>
+        <input id="strength" type="range" min="0" max="1" step="0.01" value="0" />
+      </label>
+      <label id="direction-label">Direction <output id="direction-value">25°</output>
+        <input id="direction" type="range" min="0" max="360" step="1" value="25" />
+      </label>
+      <div id="bend-options">
+        <label class="check"><input id="show-mesh" type="checkbox" checked /> Visible geometry</label>
+        <label class="check"><input id="show-proxy" type="checkbox" checked /> Lighting proxy</label>
+        <label class="check"><input id="show-splats" type="checkbox" checked /> Splats</label>
+      </div>
+      <div id="impact-options" hidden>
+        <button id="strike" type="button">Strike upper face</button>
+        <p class="hint">Click a block to hit it there. Pieces fall and collide with the ground.</p>
+      </div>
+      <button id="reset" type="button">Reset</button>
+      <dl id="readout"></dl>
+    </aside>
+    <script type="module" src="/src/demo/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,1273 @@
+{
+  "schemaVersion": 1,
+  "id": "synthetic-tower",
+  "name": "Synthetic tower",
+  "provenance": {
+    "kind": "procedural",
+    "scene": null,
+    "cameras": null,
+    "split": null,
+    "reconstruction": null,
+    "scale": "authored meters",
+    "attribution": "Original procedural fixture for the Splatastrophe bend and impact prototypes. No photographs, scan, dataset, or trained splat."
+  },
+  "coordinateConvention": {
+    "handedness": "right",
+    "up": "Y",
+    "units": "meters",
+    "quaternion": "xyzw"
+  },
+  "building": {
+    "id": "synthetic-tower",
+    "count": 1,
+    "center": [
+      0,
+      0,
+      0
+    ],
+    "height": 5.96,
+    "base": {
+      "width": 2.08,
+      "depth": 2.08
+    },
+    "top": {
+      "width": 1.4,
+      "depth": 1.4
+    },
+    "anchorHeight": 0.96,
+    "heightSegments": 28,
+    "note": "Continuous shell used by the bend prototype. The impact section is a prismatic block stack with the same footprint and overall height, not a voxelization of the taper."
+  },
+  "light": {
+    "type": "directional",
+    "count": 1,
+    "castShadow": true,
+    "direction": [
+      -0.42,
+      -1,
+      -0.28
+    ],
+    "color": [
+      1,
+      0.96,
+      0.9
+    ],
+    "intensity": 1.7,
+    "ambient": [
+      0.38,
+      0.4,
+      0.44
+    ],
+    "note": "Exactly one shadow-casting light. Ambient is a constant fill, not a second source and not a shadow caster."
+  },
+  "bend": {
+    "maxTipAngleRadians": 0.7,
+    "heightWeight": "quadratic",
+    "responseSeconds": 0.4,
+    "splatGrid": [
+      3,
+      16,
+      3
+    ],
+    "splatScale": [
+      0.18,
+      0.3,
+      0.18
+    ],
+    "splatInset": 0.26,
+    "proxyOutset": 0.045
+  },
+  "impact": {
+    "representation": "prismatic-block-stack",
+    "gravity": [
+      0,
+      -9.81,
+      0
+    ],
+    "maxImpulse": 240,
+    "influenceRadius": 1.35,
+    "density": 40,
+    "friction": 0.75,
+    "restitution": 0.04,
+    "linearDamping": 0.08,
+    "angularDamping": 0.35,
+    "fixedTimestep": 0.016666666666666666,
+    "solver": "rapier3d",
+    "layout": {
+      "columnsX": 2,
+      "columnsZ": 2,
+      "levels": 6,
+      "blockSize": [
+        1.02,
+        0.96,
+        1.02
+      ],
+      "gap": 0.04
+    },
+    "bodies": [
+      {
+        "id": "block-x0-z0-y0",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          0.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z0-y0",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          0.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z1-y0",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          0.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z1-y0",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          0.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z0-y1",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          1.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z0-y1",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          1.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z1-y1",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          1.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z1-y1",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          1.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z0-y2",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          2.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z0-y2",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          2.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z1-y2",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          2.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z1-y2",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          2.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z0-y3",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          3.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z0-y3",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          3.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z1-y3",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          3.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z1-y3",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          3.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z0-y4",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          4.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z0-y4",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          4.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z1-y4",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          4.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z1-y4",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          4.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z0-y5",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          5.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z0-y5",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          5.48,
+          -0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x0-z1-y5",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          -0.53,
+          5.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "id": "block-x1-z1-y5",
+        "halfExtents": [
+          0.51,
+          0.48,
+          0.51
+        ],
+        "position": [
+          0.53,
+          5.48,
+          0.53
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "id": "joint-block-x0-z0-y0__block-x1-z0-y0",
+        "bodyA": "block-x0-z0-y0",
+        "bodyB": "block-x1-z0-y0",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 11
+      },
+      {
+        "id": "joint-block-x0-z0-y0__block-x0-z1-y0",
+        "bodyA": "block-x0-z0-y0",
+        "bodyB": "block-x0-z1-y0",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 11
+      },
+      {
+        "id": "joint-block-x0-z0-y0__block-x0-z0-y1",
+        "bodyA": "block-x0-z0-y0",
+        "bodyB": "block-x0-z0-y1",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 18
+      },
+      {
+        "id": "joint-block-x1-z0-y0__block-x1-z1-y0",
+        "bodyA": "block-x1-z0-y0",
+        "bodyB": "block-x1-z1-y0",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 11
+      },
+      {
+        "id": "joint-block-x1-z0-y0__block-x1-z0-y1",
+        "bodyA": "block-x1-z0-y0",
+        "bodyB": "block-x1-z0-y1",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 18
+      },
+      {
+        "id": "joint-block-x0-z1-y0__block-x1-z1-y0",
+        "bodyA": "block-x0-z1-y0",
+        "bodyB": "block-x1-z1-y0",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 11
+      },
+      {
+        "id": "joint-block-x0-z1-y0__block-x0-z1-y1",
+        "bodyA": "block-x0-z1-y0",
+        "bodyB": "block-x0-z1-y1",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 18
+      },
+      {
+        "id": "joint-block-x1-z1-y0__block-x1-z1-y1",
+        "bodyA": "block-x1-z1-y0",
+        "bodyB": "block-x1-z1-y1",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 18
+      },
+      {
+        "id": "joint-block-x0-z0-y1__block-x1-z0-y1",
+        "bodyA": "block-x0-z0-y1",
+        "bodyB": "block-x1-z0-y1",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 9.6
+      },
+      {
+        "id": "joint-block-x0-z0-y1__block-x0-z1-y1",
+        "bodyA": "block-x0-z0-y1",
+        "bodyB": "block-x0-z1-y1",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 9.6
+      },
+      {
+        "id": "joint-block-x0-z0-y1__block-x0-z0-y2",
+        "bodyA": "block-x0-z0-y1",
+        "bodyB": "block-x0-z0-y2",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 15.5
+      },
+      {
+        "id": "joint-block-x1-z0-y1__block-x1-z1-y1",
+        "bodyA": "block-x1-z0-y1",
+        "bodyB": "block-x1-z1-y1",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 9.6
+      },
+      {
+        "id": "joint-block-x1-z0-y1__block-x1-z0-y2",
+        "bodyA": "block-x1-z0-y1",
+        "bodyB": "block-x1-z0-y2",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 15.5
+      },
+      {
+        "id": "joint-block-x0-z1-y1__block-x1-z1-y1",
+        "bodyA": "block-x0-z1-y1",
+        "bodyB": "block-x1-z1-y1",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 9.6
+      },
+      {
+        "id": "joint-block-x0-z1-y1__block-x0-z1-y2",
+        "bodyA": "block-x0-z1-y1",
+        "bodyB": "block-x0-z1-y2",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 15.5
+      },
+      {
+        "id": "joint-block-x1-z1-y1__block-x1-z1-y2",
+        "bodyA": "block-x1-z1-y1",
+        "bodyB": "block-x1-z1-y2",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 15.5
+      },
+      {
+        "id": "joint-block-x0-z0-y2__block-x1-z0-y2",
+        "bodyA": "block-x0-z0-y2",
+        "bodyB": "block-x1-z0-y2",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 8.2
+      },
+      {
+        "id": "joint-block-x0-z0-y2__block-x0-z1-y2",
+        "bodyA": "block-x0-z0-y2",
+        "bodyB": "block-x0-z1-y2",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 8.2
+      },
+      {
+        "id": "joint-block-x0-z0-y2__block-x0-z0-y3",
+        "bodyA": "block-x0-z0-y2",
+        "bodyB": "block-x0-z0-y3",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 13
+      },
+      {
+        "id": "joint-block-x1-z0-y2__block-x1-z1-y2",
+        "bodyA": "block-x1-z0-y2",
+        "bodyB": "block-x1-z1-y2",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 8.2
+      },
+      {
+        "id": "joint-block-x1-z0-y2__block-x1-z0-y3",
+        "bodyA": "block-x1-z0-y2",
+        "bodyB": "block-x1-z0-y3",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 13
+      },
+      {
+        "id": "joint-block-x0-z1-y2__block-x1-z1-y2",
+        "bodyA": "block-x0-z1-y2",
+        "bodyB": "block-x1-z1-y2",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 8.2
+      },
+      {
+        "id": "joint-block-x0-z1-y2__block-x0-z1-y3",
+        "bodyA": "block-x0-z1-y2",
+        "bodyB": "block-x0-z1-y3",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 13
+      },
+      {
+        "id": "joint-block-x1-z1-y2__block-x1-z1-y3",
+        "bodyA": "block-x1-z1-y2",
+        "bodyB": "block-x1-z1-y3",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 13
+      },
+      {
+        "id": "joint-block-x0-z0-y3__block-x1-z0-y3",
+        "bodyA": "block-x0-z0-y3",
+        "bodyB": "block-x1-z0-y3",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 6.8
+      },
+      {
+        "id": "joint-block-x0-z0-y3__block-x0-z1-y3",
+        "bodyA": "block-x0-z0-y3",
+        "bodyB": "block-x0-z1-y3",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 6.8
+      },
+      {
+        "id": "joint-block-x0-z0-y3__block-x0-z0-y4",
+        "bodyA": "block-x0-z0-y3",
+        "bodyB": "block-x0-z0-y4",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 10.5
+      },
+      {
+        "id": "joint-block-x1-z0-y3__block-x1-z1-y3",
+        "bodyA": "block-x1-z0-y3",
+        "bodyB": "block-x1-z1-y3",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 6.8
+      },
+      {
+        "id": "joint-block-x1-z0-y3__block-x1-z0-y4",
+        "bodyA": "block-x1-z0-y3",
+        "bodyB": "block-x1-z0-y4",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 10.5
+      },
+      {
+        "id": "joint-block-x0-z1-y3__block-x1-z1-y3",
+        "bodyA": "block-x0-z1-y3",
+        "bodyB": "block-x1-z1-y3",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 6.8
+      },
+      {
+        "id": "joint-block-x0-z1-y3__block-x0-z1-y4",
+        "bodyA": "block-x0-z1-y3",
+        "bodyB": "block-x0-z1-y4",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 10.5
+      },
+      {
+        "id": "joint-block-x1-z1-y3__block-x1-z1-y4",
+        "bodyA": "block-x1-z1-y3",
+        "bodyB": "block-x1-z1-y4",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 10.5
+      },
+      {
+        "id": "joint-block-x0-z0-y4__block-x1-z0-y4",
+        "bodyA": "block-x0-z0-y4",
+        "bodyB": "block-x1-z0-y4",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 5.4
+      },
+      {
+        "id": "joint-block-x0-z0-y4__block-x0-z1-y4",
+        "bodyA": "block-x0-z0-y4",
+        "bodyB": "block-x0-z1-y4",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 5.4
+      },
+      {
+        "id": "joint-block-x0-z0-y4__block-x0-z0-y5",
+        "bodyA": "block-x0-z0-y4",
+        "bodyB": "block-x0-z0-y5",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 8
+      },
+      {
+        "id": "joint-block-x1-z0-y4__block-x1-z1-y4",
+        "bodyA": "block-x1-z0-y4",
+        "bodyB": "block-x1-z1-y4",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 5.4
+      },
+      {
+        "id": "joint-block-x1-z0-y4__block-x1-z0-y5",
+        "bodyA": "block-x1-z0-y4",
+        "bodyB": "block-x1-z0-y5",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 8
+      },
+      {
+        "id": "joint-block-x0-z1-y4__block-x1-z1-y4",
+        "bodyA": "block-x0-z1-y4",
+        "bodyB": "block-x1-z1-y4",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 5.4
+      },
+      {
+        "id": "joint-block-x0-z1-y4__block-x0-z1-y5",
+        "bodyA": "block-x0-z1-y4",
+        "bodyB": "block-x0-z1-y5",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 8
+      },
+      {
+        "id": "joint-block-x1-z1-y4__block-x1-z1-y5",
+        "bodyA": "block-x1-z1-y4",
+        "bodyB": "block-x1-z1-y5",
+        "anchorA": [
+          0,
+          0.5,
+          0
+        ],
+        "anchorB": [
+          0,
+          -0.5,
+          0
+        ],
+        "breakImpulse": 8
+      },
+      {
+        "id": "joint-block-x0-z0-y5__block-x1-z0-y5",
+        "bodyA": "block-x0-z0-y5",
+        "bodyB": "block-x1-z0-y5",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 4
+      },
+      {
+        "id": "joint-block-x0-z0-y5__block-x0-z1-y5",
+        "bodyA": "block-x0-z0-y5",
+        "bodyB": "block-x0-z1-y5",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 4
+      },
+      {
+        "id": "joint-block-x1-z0-y5__block-x1-z1-y5",
+        "bodyA": "block-x1-z0-y5",
+        "bodyB": "block-x1-z1-y5",
+        "anchorA": [
+          0,
+          0,
+          0.53
+        ],
+        "anchorB": [
+          0,
+          0,
+          -0.53
+        ],
+        "breakImpulse": 4
+      },
+      {
+        "id": "joint-block-x0-z1-y5__block-x1-z1-y5",
+        "bodyA": "block-x0-z1-y5",
+        "bodyB": "block-x1-z1-y5",
+        "anchorA": [
+          0.53,
+          0,
+          0
+        ],
+        "anchorB": [
+          -0.53,
+          0,
+          0
+        ],
+        "breakImpulse": 4
+      }
+    ],
+    "note": "Connections are predefined breakable fixed joints. impact() breaks a joint when the larger endpoint impulse meets breakImpulse. Density and thresholds are demo values chosen so a hit is visible; they are not measured material strengths."
+  }
+}
