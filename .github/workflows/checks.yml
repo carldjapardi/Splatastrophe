@@ -1,0 +1,42 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: python -m unittest discover -s tests -v
+      - name: Validate notebook code syntax
+        run: |
+          python - <<'PY'
+          import ast, json
+          from pathlib import Path
+          for path in Path('notebooks').glob('*.ipynb'):
+              for index, cell in enumerate(json.loads(path.read_text())['cells']):
+                  if cell['cell_type'] == 'code':
+                      ast.parse(''.join(cell['source']), filename=f'{path}:cell-{index}')
+          PY
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run check

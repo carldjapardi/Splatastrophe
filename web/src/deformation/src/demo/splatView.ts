@@ -3,8 +3,6 @@ import {
   Entity,
   GSplatContainer,
   GSplatFormat,
-  Mesh,
-  MeshInstance,
   StandardMaterial,
   Vec3,
   type AppBase,
@@ -39,45 +37,51 @@ function createGsplatView(app: AppBase, cloud: SplatCloud): SplatView {
   const device = app.graphicsDevice;
   const format = GSplatFormat.createDefaultFormat(device);
   const container = new GSplatContainer(device, cloud.count, format);
-  const centerTex = container.getTexture('dataCenter');
-  const colorTex = container.getTexture('dataColor');
-  const scaleTex = container.getTexture('dataScale');
-  const rotationTex = container.getTexture('dataRotation');
-  if (!centerTex || !colorTex || !scaleTex || !rotationTex) {
-    throw new Error('GSplatContainer is missing center, color, scale, or rotation streams');
-  }
-
-  writeColor(colorTex.lock(), cloud);
-  colorTex.unlock();
-
-  const bounds = new BoundingBox();
-  const min = new Vec3();
-  const max = new Vec3();
-  container.centers = cloud.positions;
-  writeDynamic(container, centerTex, scaleTex, rotationTex, cloud, bounds, min, max);
-  container.aabb = bounds;
-  container.update(cloud.count, true);
-
   const entity = new Entity('tower-splats');
-  entity.addComponent('gsplat', { resource: container });
-  app.root.addChild(entity);
+  try {
+    const centerTex = container.getTexture('dataCenter');
+    const colorTex = container.getTexture('dataColor');
+    const scaleTex = container.getTexture('dataScale');
+    const rotationTex = container.getTexture('dataRotation');
+    if (!centerTex || !colorTex || !scaleTex || !rotationTex) {
+      throw new Error('GSplatContainer is missing center, color, scale, or rotation streams');
+    }
 
-  return {
-    kind: 'playcanvas-gsplat',
-    note: 'PlayCanvas GSplatContainer. Each splat writes position, [w,x,y,z] rotation, and linear scale; the renderer rebuilds covariance. Splats are not in the mesh shadow/lighting pass.',
-    update(next) {
-      writeDynamic(container, centerTex, scaleTex, rotationTex, next, bounds, min, max);
-      container.aabb = bounds;
-      container.update(next.count, true);
-    },
-    setVisible(visible) {
-      entity.enabled = visible;
-    },
-    dispose() {
-      entity.destroy();
-      container.destroy();
-    },
-  };
+    writeColor(colorTex.lock(), cloud);
+    colorTex.unlock();
+
+    const bounds = new BoundingBox();
+    const min = new Vec3();
+    const max = new Vec3();
+    container.centers = cloud.positions;
+    writeDynamic(container, centerTex, scaleTex, rotationTex, cloud, bounds, min, max);
+    container.aabb = bounds;
+    container.update(cloud.count, true);
+
+    entity.addComponent('gsplat', { resource: container });
+    app.root.addChild(entity);
+
+    return {
+      kind: 'playcanvas-gsplat',
+      note: 'Procedural Gaussians with changing position, rotation and scale. Optional proxy lighting modulates splat fragments; captured lighting cannot be removed by this approximation.',
+      update(next) {
+        writeDynamic(container, centerTex, scaleTex, rotationTex, next, bounds, min, max);
+        container.aabb = bounds;
+        container.update(next.count, true);
+      },
+      setVisible(visible) {
+        entity.enabled = visible;
+      },
+      dispose() {
+        entity.destroy();
+        container.destroy();
+      },
+    };
+  } catch (error) {
+    entity.destroy();
+    container.destroy();
+    throw error;
+  }
 }
 
 function writeDynamic(
@@ -207,6 +211,7 @@ function createEllipsoidFallback(app: AppBase, cloud: SplatCloud, reason: string
     },
     dispose() {
       root.destroy();
+      material.destroy();
     },
   };
   view.update(cloud);
