@@ -1,8 +1,8 @@
-# Bend prototype
+# Local synthetic playground
 
 Procedural bending for the synthetic tower. No reconstruction, dataset, or checkpoint is required.
 
-The controller is a reusable module. The Vite demo in this folder is a standalone harness so it does not depend on the app shell.
+The existing controller modules are reused by the TypeScript playground. The entry point in this folder loads `web/public/catalog.json`; application integration lives in `web/src/playground/`. The fixture is dynamically imported from its single source in `fixtures/physics/`. Only the synthetic tower fixture is supported; this catalog is not a final-splat adapter.
 
 ## Run
 
@@ -21,7 +21,7 @@ Bend and impact are separate modes. Switching modes resets both. Orbit with the 
 
 The impact mode uses the controller in `web/src/impact/`. Both modes read `fixtures/physics/synthetic-tower.json`.
 
-Query parameters for a repeatable view: `?bend=0.75&dir=25`, `?mode=impact&strike=1`.
+Query parameters for a repeatable view: `?bend=0.75&dir=25`, `?mode=impact&strike=1`. The impact shortcut applies an initial strike at strength 0.85 unless a strength of at least 0.5 is supplied via `bend`. Display overrides include `mesh=1`, `splats=0`, and `proxy=0`. Each reload restores the URL/default checkbox state, including relighting enabled, rather than retaining the previous controls.
 
 ## API
 
@@ -37,10 +37,16 @@ Query parameters for a repeatable view: `?bend=0.75&dir=25`, `?mode=impact&strik
 
 Coordinates are right-handed, Y-up, meters.
 
-## What the demo shows
+## What the playground shows
 
-One tapered tower and one shadow-casting directional light. The translucent shell is optional visible geometry. A slightly larger shell uses the same deformation field and renders only into PlayCanvas's offscreen relighting layer; it also casts shadows. The official `GSplatRelighting` script transfers that proxy lighting to the procedural Gaussians. Hide visible geometry to inspect splat lighting independently. Toggle **Relight splats** for an original/relit comparison, drag the gold sun to change its azimuth/elevation without orbiting the camera, and use the intensity/reset controls. This is a directional-sun feasibility test, not the release spotlight/aim interface.
+One configurable synthetic tower and one shadow-casting spotlight. Drag the gold marker to move the light on its current horizontal plane; drag the teal marker to aim it independently. Height sliders move each plane. Orbit pauses during handle dragging and resumes after release/cancellation. Intensity/color, light reset, camera reset and Reset all are separate controls. **Relight splats** compares original and proxy-modulated appearance; hide the visible mesh to inspect actual Gaussian shading.
 
-Procedural Gaussians update center, rotation, and scale together. The HUD prints the tip quaternion, axial scale, and a two-second average FPS. Diagnostics refresh at 4 Hz. Navigation and hot module replacement release demo listeners, physics, custom materials, and splat resources; late physics initialization is disposed if the page has already been torn down.
+The offscreen gray proxy uses the same deformation field as the tower splats and casts shadows onto the ground. PlayCanvas's official `GSplatRelighting` script transfers its lighting to splat fragments. This is approximate lighting, not recovered materials. Both procedural modes are visual/rigid-body prototypes, not PhysGaussian.
 
-See [LIMITATIONS.md](LIMITATIONS.md).
+**Reload** disposes the current view and reloads the runtime catalog/fixture. Loading/validation/initialization failures disable controls and show **Retry loading**. Superseded loads are aborted; late resources are disposed. The catalog contains camera/lighting defaults and supported actions. Unsupported fixture types fail explicitly; final reconstruction loading and deformation/proxy compatibility are deferred.
+
+Bend strength controls the kinematic target. Switching modes resets both controllers, then bend mode eases toward the selected strength; impact applies an impulse only when clicked/struck. Reset building clears the bend strength in bend mode, or restores all block poses/joints in impact mode. Reload restores catalog/query defaults.
+
+**Inspect the prototype** exposes mesh/proxy/splat toggles, camera/light state, a two-second FPS average and a five-second sampling button. Diagnostics refresh at 4 Hz. Navigation/hot reload disposes listeners, physics, custom materials and splat resources. See [the local verification record](../../../experiments/viewer/2026-11-18-synthetic-playground.md) for device, browser, viewport, settings, measured results and limitations.
+
+The production output is static `web/dist/`; this task does not deploy it. See [LIMITATIONS.md](LIMITATIONS.md).
