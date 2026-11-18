@@ -4,7 +4,7 @@ Splatastrophe reconstructs real buildings from photographs as Gaussian splats an
 
 ## Single source of truth
 
-Read [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) before planning or implementing work. It is the sole maintained source for scope, architecture, decisions, milestones, budget, evaluation, and implementation status. Update it when those change; keep this file as a short entry point rather than duplicating the plan or creating parallel roadmaps. Record completed work only when supported by code or experimental evidence.
+Read [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) before planning or implementing work. It is the sole maintained source for scope, architecture, decisions, milestones, budget, evaluation, and project-level implementation status. Update it when those change; keep this file as a short entry point rather than duplicating the plan or creating parallel roadmaps. GitHub Issues track individual tasks under that plan. Record completed work only when supported by code or experimental evidence.
 
 The original proposals are historical references, not current requirements. Paper figures and product mockups are not implementation results.
 
@@ -16,3 +16,15 @@ Read the plan's [research and dataset context](docs/IMPLEMENTATION_PLAN.md#resea
 - Keep manual baselines, automatic experiments, simulated physics, and approximate visual effects clearly identified.
 - Use the plan's dataset guidance; record the exact scene/version, camera provenance, split, scale, and attribution in its configuration. Keep large datasets/checkpoints outside Git.
 - Validate a small complete path through export and browser playback before scaling GPU jobs or adding buildings. Log reproducible settings, results, limitations, and compute cost.
+
+## Agent coordination: Slack and GitHub Issues
+
+Use [GitHub Issues](https://github.com/SriyaKan/Splatastrophe/issues) to track tasks and [#all-splatastrophecs180](https://splatastrophecs180.slack.com/archives/C0CKK4TN1G8) for agent communication and handoffs.
+
+- Before editing, read current issues and Slack threads. Identify your agent name and human owner, claim a task, and record its scope, branch, and affected files. Resolve overlapping claims before proceeding.
+- Break work into small issues with one responsible agent, dependencies, and clear acceptance checks. Keep issue status current: in progress, blocked, review, or done. Reflect project decisions and verified milestones in the implementation plan.
+- Use separate branches and checkouts/worktrees for concurrent tasks (`codex/` branches for Codex). Agree on shared-file or interface changes with their owner; never overwrite another agent's work.
+- Keep one Slack thread per issue. Prefix messages with `[agent-name]` and include the issue link, status, brief update, artifact/test results, and next action. Post meaningful progress and blockers; copy decisions back to the issue.
+- Address handoffs to a named agent and wait for acknowledgment before transferring ownership. End sessions with a checkpoint. Mark work done only when acceptance checks and required integration are complete, with evidence linked.
+
+If Slack or GitHub access is unavailable, tell the human owner and resolve ownership before overlapping work. These instructions do not make agents listen continuously; automatic exchanges need a runner that routes addressed tasks, deduplicates events, ignores its own messages, and limits reply chains.

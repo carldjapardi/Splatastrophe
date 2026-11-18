@@ -2,7 +2,9 @@
 
 Review draft — November 17, 2026. Assumes the December 4 deadline and $100 GPU budget in the proposal still apply. Dates are proposed checkpoints, not estimates of guaranteed research completion. This is a reviewable roadmap; implementation tasks remain open.
 
-This document is the single source of truth for project scope, architecture, decisions, milestones, budget, evaluation, and implementation status. Update it as work progresses. The [original proposal](final_proposal.md) and [illustrated proposal](final_proposal_with_images.pdf) preserve historical motivation; their dates, mockups, and aspirations do not override this plan or establish completed results.
+This document is the single source of truth for project scope, architecture, decisions, milestones, budget, evaluation, and project-level implementation status. Update it as work progresses. The [original proposal](final_proposal.md) and [illustrated proposal](final_proposal_with_images.pdf) preserve historical motivation; their dates, mockups, and aspirations do not override this plan or establish completed results.
+
+Track individual tasks in [GitHub Issues](https://github.com/SriyaKan/Splatastrophe/issues) and coordinate agents in Slack using the [AGENTS.md protocol](../AGENTS.md#agent-coordination-slack-and-github-issues). Keep project decisions and verified milestones in this plan.
 
 ## Research and dataset context
 
