@@ -4,15 +4,15 @@ Review draft — November 17, 2026. Assumes the December 4 deadline and $100 GPU
 
 ## 1. Define the first release
 
-Deliver an interactive website with a playground viewer and a reusable library of buildings. Visitors choose a building, orbit/zoom, select components, apply supported actions, and see it bend, sway, or respond to impact while retaining camera control. Include reset, appearance controls, and a methods/results page. One building is the first technical milestone, not the final product scope. Proposed initial catalog target: three buildings, with at least two to demonstrate that the pipeline and viewer generalize; the exact catalog size remains a scope decision. Start with one active building at a time; a simultaneous multi-building scene is a later extension.
+Deliver an interactive website with a playground viewer and a reusable library of buildings. Visitors choose a building, orbit/zoom, select components, apply supported actions, and see it bend, sway, or respond to impact while retaining camera control. Include reset, a draggable light that updates building shading and shadows, appearance controls, and a methods/results page. One building is the first technical milestone, not the final product scope. Proposed initial catalog target: three buildings, with at least two to demonstrate that the pipeline and viewer generalize; the exact catalog size remains a scope decision. Start with one active building at a time; a simultaneous multi-building scene is a later extension.
 
 The research objective is to test whether structural grouping makes splat animation more controllable and visually coherent. Manual grouping establishes a baseline; automatic grouping using Differentiable Blocks World is an explicit experiment. If it fails, report that result and keep the manual baseline functional.
 
-Required product capabilities: multiple selectable buildings, a common action interface, and visible bending/deformation for supported actions. Proposed actions are push/bend, lateral shake, and impact; implement at least two, including one that bends the building. Stretch scope: larger destruction, automatic material suggestions, physical relighting, and user-uploaded reconstruction. The original proposal favors precomputed physics to fit the GPU budget. Use discrete action locations/directions/strengths backed by clips for the initial implementation; if continuous dragging or freely adjustable forces are required, prototype a lightweight live deformation model and validate its cost before promising that behavior. Playback speed does not change physical stiffness or impact force.
+Required product capabilities: multiple selectable buildings, a common action interface, and visible bending/deformation for supported actions. Proposed actions are push/bend, lateral shake, and impact; implement at least two, including one that bends the building. Stretch scope: larger destruction, automatic material suggestions, inverse-rendered material recovery, full ray-traced lighting, and user-uploaded reconstruction. The original proposal favors precomputed physics to fit the GPU budget. Use discrete action locations/directions/strengths backed by clips for the initial implementation; if continuous dragging or freely adjustable forces are required, prototype a lightweight live deformation model and validate its cost before promising that behavior. Playback speed does not change physical stiffness or impact force.
 
 ## 2. Establish the architecture and interfaces
 
-- Web: React, TypeScript, Vite, Three.js, and Spark as the initial splat renderer candidate. Use Vercel for the site; no backend is needed for the first release.
+- Web: React, TypeScript, and Vite. Compare Three.js + Spark against PlayCanvas in the first feasibility milestone, using both bending and movable lighting as selection criteria. PlayCanvas has a documented proxy-mesh relighting path; Spark would need its lighting/shadow integration validated. Select one renderer before building the full viewer. Use Vercel for the site; no backend is needed for the first release.
 - Offline pipeline: Python scripts for data preparation, reconstruction export, component assignment, simulation conversion, and evaluation.
 - Reconstruction: COLMAP poses and Nerfstudio Splatfacto training/export.
 - Physics: test PhysGaussian in its own pinned GPU environment for high-quality offline responses. Keep reconstruction and physics environments separate. Prototype a lightweight browser deformation model only if continuous force interaction is needed; label approximate visual responses accurately.
@@ -101,32 +101,53 @@ If deformation storage or playback is impractical, test a reduced deformation mo
 
 Checkpoint: user actions produce visible responses on each release building, including bending, with camera control, stable supports, bounded downloads/memory, and documented simulation settings.
 
+## 8A. Add draggable lighting and dynamic shadows
+
+Required behavior: the visitor can drag a light around a building and immediately see changed surface shading and cast shadows, including while the building bends. Begin with one movable spotlight plus a low ambient fill and a ground receiver. Expose position, aim/target, intensity, color, and reset. A sun-direction control can follow. Optional drawn rays/cones are explanatory helpers; volumetric light beams are separate scope.
+
+Standard splats preserve captured illumination rather than clean material colors. The proposed first implementation is approximate relighting using an aligned proxy mesh. PlayCanvas documents rendering a lit proxy into an offscreen texture and transferring that lighting to splat fragments; it also notes that silhouette mismatch produces incorrect lighting boundaries. [PlayCanvas relighting](https://developer.playcanvas.com/user-manual/gaussian-splatting/building/relighting/)
+
+Implementation sequence:
+
+1. Create a simple test building, aligned splats, proxy mesh, and ground. Start with a coarse hand-built proxy; DBW primitives may provide a later starting point, but lighting needs sufficiently accurate surfaces and openings.
+2. Attach a draggable handle to the light and a separate aim target. Pause camera orbit during handle dragging and restore it afterward. Three.js provides object manipulation through TransformControls if that renderer is selected. [TransformControls](https://threejs.org/docs/pages/TransformControls)
+3. Calculate lit proxy shading and shadow maps, then integrate those results into the splat shading path. Keep the proxy out of the main visible color pass while retaining it in lighting/shadow passes. Setting an ordinary splat object's castShadow flag alone is not an implementation.
+4. Test ground shadows first, then receiving shadows on building surfaces and self-shadowing. Validate proxy coverage/depth at silhouettes and overlapping surfaces; a ground-only shadow does not satisfy the requirement. Work in a consistent linear-color pipeline and apply tone mapping once.
+5. Bind the proxy to the same component poses or deformation field as the splats. Export matching proxy motion for precomputed simulations, update normals after bending, and refresh lighting/shadows when geometry or light state changes. A physics collision proxy may be too coarse for acceptable lighting.
+6. Register proxy assets, deformation binding, light defaults, ground settings, and supported quality presets in each building manifest. Test switching and resetting buildings with active lighting.
+
+Lighting runs live in the browser even when physics motion is precomputed, so light position is independent of the selected animation clip. Start with one shadow-casting light and benchmark the combined deformation, splat sorting, and lighting workload before adding more lights. Shadow maps are the initial implementation; full ray tracing is a later option.
+
+Quality limitation: proxy modulation cannot reliably erase shadows/highlights already captured in the splat colors. Prefer diffuse-lit source imagery, provide an original/relit comparison, and document double-shadow or residual-highlight artifacts. If convincing light replacement is essential, add a separate inverse-rendering experiment to recover normals/materials/illumination and export browser-compatible attributes. GS-IR is a candidate research baseline, not a drop-in viewer plugin. [GS-IR paper](https://arxiv.org/abs/2311.16473)
+
+Acceptance test: on every release building, drag the light left/right/up, vary its aim, bend the building, and confirm that surface brightness, ground shadows, and supported self-shadows respond coherently. Measure FPS and input latency with lighting and animation enabled together. Keep the original reconstruction PSNR/SSIM evaluation separate from the relighting evaluation. Do not mark accurate physical relighting achieved based on a tint/exposure control.
+
 ## 9. Complete the playground and publish
 
 Build the UI around the building catalog and playground: building picker with previews, orbit/zoom/reset, component/target selection, recolor, action tools, supported direction/strength controls, play/pause/scrub for clips, and clear loading/error states. Design the main interaction as choose building → choose action → select target/settings → apply → observe/reset. Offer quality presets if needed. Display playback speed separately from scenario strength.
 
-Start appearance controls with tint, exposure, and background. Standard splats encode captured appearance; adding a Three.js light does not automatically give correct landmark relighting. Treat dynamic shadows/relighting as a separate experiment after the required demo works.
+Include a lighting mode with draggable light/target handles and shadow controls alongside tint, exposure, and background. Complete the lighting milestone above; ordinary tint/exposure changes alone do not satisfy it.
 
 Add the project explanation, pipeline illustration, dataset credits, experiment comparisons, metrics, limitations, and repository link. Deploy an early preview, then test the final Vercel site with its actual asset URLs, CORS settings, caching, and deep links. Measure loading from a cold cache as well as steady playback.
 
-Checkpoint: a visitor can open the published link, switch between buildings, apply both supported actions to each, see bending, move the camera during the response, and reset successfully. Switching buildings repeatedly must not retain stale actions or leak model memory. Retain a recorded demo as backup evidence.
+Checkpoint: a visitor can open the published link, switch between buildings, apply both supported actions to each, see bending, move the camera during the response, drag the light to change shading/shadows, and reset successfully. Switching buildings repeatedly must not retain stale actions or leak model memory. Retain a recorded demo as backup evidence.
 
 ## Proposed schedule
 
 | Dates | Checkpoint |
 |---|---|
-| Nov 18–19 | Catalog/action interfaces; sample viewer; component motion and bending feasibility; PhysGaussian smoke test |
+| Nov 18–19 | Catalog/action interfaces; sample viewer; component motion, bending and proxy-lighting feasibility; renderer selection; PhysGaussian smoke test |
 | Nov 20–22 | Dataset preparation, first reconstruction, held-out metrics, browser export |
-| Nov 23–25 | Manual grouping, first action-driven bending response, short dynamic playback proof; prepare additional buildings |
+| Nov 23–25 | Manual grouping, first action-driven bending response, proxy deformation/shadow synchronization, short dynamic playback proof; prepare additional buildings |
 | Nov 26–28 | Timeboxed DBW comparison; second action; repeat pipeline for remaining release buildings |
-| Nov 29–Dec 1 | Catalog switching, full action controls, asset optimization, appearance controls, deployment |
+| Nov 29–Dec 1 | Catalog switching, full action controls, asset optimization, draggable lighting/shadows, appearance controls, deployment |
 | Dec 2–3 | Evaluation, browser testing, figures, write-up, final fixes |
 | Dec 4 | Submission buffer and final link verification |
 
-Prioritize a functioning manual-grouping demo if research work slips. If action-driven bending fails by Nov 25, prioritize a reduced deformation model or smaller scenes and reassess the schedule. A rigid-motion-only viewer is a partial milestone, not completion of the intended product. Automatic materials and physical relighting are the first features to defer.
+Prioritize a functioning manual-grouping demo if research work slips. If action-driven bending fails by Nov 25, prioritize a reduced deformation model or smaller scenes and reassess the schedule. A rigid-motion-only viewer is a partial milestone, not completion of the intended product. Automatic materials, inverse-rendered material recovery, and full ray tracing are the first features to defer. Draggable approximate lighting with responsive shading/shadows remains a required product feature.
 
 ## GPU budget and completion criteria
 
 Proposed $100 allocation: $10 environment/smoke tests; $35 reconstruction; $20 physics; $15 DBW; $20 contingency. These are spending caps, not provider quotes. Set a cost limit before each job, save checkpoints, and shut down idle instances. Verify actual rental and asset-storage charges before committing funds.
 
-Done means: a reusable catalog with multiple buildings (proposed target three; minimum two); building switching without viewer code changes; reproducible configurations and held-out PSNR/SSIM reports for our reconstructions; at least two supported actions per release building including visible bending; free camera movement during responses; reliable reset; ≥20 FPS on the stated test machine/resolution; a published playground and results page; and an honest account of automatic grouping, precomputed versus live responses, and fallback methods. Evaluate action-to-response latency and repeated building-switch memory behavior as well as rendering FPS. Existing licensed sample buildings may help test the catalog, but identify them separately from our own reconstructions.
+Done means: a reusable catalog with multiple buildings (proposed target three; minimum two); building switching without viewer code changes; reproducible configurations and held-out PSNR/SSIM reports for our reconstructions; at least two supported actions per release building including visible bending; free camera movement during responses; draggable lighting with responsive building shading and shadows during deformation; reliable reset; ≥20 FPS on the stated test machine/resolution; a published playground and results page; and an honest account of automatic grouping, precomputed versus live responses, and fallback methods. Evaluate action-to-response latency and repeated building-switch memory behavior as well as rendering FPS. Existing licensed sample buildings may help test the catalog, but identify them separately from our own reconstructions.
