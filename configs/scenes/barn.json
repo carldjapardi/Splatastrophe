@@ -1,0 +1,13 @@
+{
+  "scene_id": "barn",
+  "source": "https://www.tanksandtemples.org/download/",
+  "dataset": "Tanks and Temples training/Barn",
+  "images": "data/raw/barn/images",
+  "processed": "data/processed/barn",
+  "outputs": "outputs/barn",
+  "camera_provenance": "COLMAP estimated from supplied images; all views used for pose estimation",
+  "scale": "Uncalibrated reconstruction units; align and establish meters before physics",
+  "attribution": "Knapitsch et al., Tanks and Temples, SIGGRAPH 2017; see dataset terms",
+  "eval_every": 10,
+  "iterations": 1000
+}

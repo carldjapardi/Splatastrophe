@@ -1,0 +1,27 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "files.exclude": {
+      "**/__pycache__": true
+    },
+    "search.exclude": {
+      "data/**": true,
+      "outputs/**": true,
+      "checkpoints/**": true,
+      "external/**": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-toolsai.jupyter",
+      "ms-vscode-remote.remote-ssh",
+      "ThunderCompute.thunder-compute"
+    ]
+  }
+}

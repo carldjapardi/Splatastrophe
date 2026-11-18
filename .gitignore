@@ -1,0 +1,22 @@
+# Local environments and credentials
+.venv/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+# Large experiment artifacts
+data/
+datasets/
+outputs/
+checkpoints/
+external/
+wandb/
+# Frontend build artifacts
+node_modules/
+dist/
+.vercel/
