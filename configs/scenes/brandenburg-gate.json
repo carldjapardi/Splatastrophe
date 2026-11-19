@@ -1,0 +1,31 @@
+{
+  "scene_id": "brandenburg-gate",
+  "source": "https://www.cs.ubc.ca/~kmyi/imw2020/data.html",
+  "dataset": "PhotoTourism IMC-PT 2020 / Brandenburg Gate with NeRF-W image membership",
+  "images": "data/raw/phototourism/brandenburg-gate/dense/images",
+  "processed": "data/processed/brandenburg-gate",
+  "outputs": "outputs/brandenburg-gate",
+  "camera_provenance": "Reuse supplied IMC-PT dense/sparse COLMAP cameras and sparse points; all-view SfM provenance; per-image intrinsics retained, no fresh pose estimation",
+  "scale": "Uncalibrated reconstruction units; align and establish meters before physics",
+  "attribution": "Snavely et al., Photo Tourism, SIGGRAPH 2006; IMC-PT 2020 collection; Martin-Brualla et al., NeRF-W, CVPR 2021 split; original photographer rights apply",
+  "eval_every": 10,
+  "iterations": 1000,
+  "release": "IMC-PT 2020 brandenburg_gate.tar.gz; NeRF-W selected_images/brandenburg.tsv; hashes recorded at download",
+  "raw": "data/raw/phototourism/brandenburg-gate",
+  "camera_source": "supplied_colmap",
+  "num_downscales": 0,
+  "train_downscale_factor": 1,
+  "mask_policy": "Full images, no foreground masks; background included in metrics",
+  "download": {
+    "filename": "brandenburg_gate.tar.gz",
+    "url": "https://www.cs.ubc.ca/research/kmyi_data/imw2020/TrainingData/brandenburg_gate.tar.gz"
+  },
+  "split": {
+    "kind": "nerfw",
+    "filename": "brandenburg.tsv",
+    "url": "https://nerf-w.github.io/data/selected_images/brandenburg.tsv",
+    "policy": "Keep official test membership; carve validation from official training images; exclude unlisted images; project full-image evaluation, not official appearance-adapted benchmark"
+  },
+  "license": "Check source dataset and original photographer terms; no blanket image redistribution permission assumed",
+  "colmap_model": "data/raw/phototourism/brandenburg-gate/dense/sparse"
+}
