@@ -1,0 +1,31 @@
+{
+  "scene_id": "sacre-coeur",
+  "source": "https://www.cs.ubc.ca/~kmyi/imw2020/data.html",
+  "dataset": "PhotoTourism IMC-PT 2020 / Sacre Coeur with NeRF-W image membership",
+  "images": "data/raw/phototourism/sacre-coeur/dense/images",
+  "processed": "data/processed/sacre-coeur",
+  "outputs": "outputs/sacre-coeur",
+  "camera_source": "supplied_colmap",
+  "camera_provenance": "Reuse supplied IMC-PT dense/sparse COLMAP cameras and sparse points; per-image intrinsics retained, no fresh pose estimation",
+  "colmap_model": "data/raw/phototourism/sacre-coeur/dense/sparse",
+  "scale": "Uncalibrated reconstruction units; align and establish meters before physics",
+  "attribution": "Snavely et al., Photo Tourism, SIGGRAPH 2006; IMC-PT 2020 collection; Martin-Brualla et al., NeRF-W, CVPR 2021 split; original photographer rights apply",
+  "eval_every": 10,
+  "iterations": 30000,
+  "num_downscales": 0,
+  "train_downscale_factor": 1,
+  "mask_policy": "Full images, no foreground masks; background included in metrics",
+  "release": "IMC-PT 2020 sacre_coeur.tar.gz; NeRF-W selected_images/sacre.tsv; hashes recorded at download",
+  "raw": "data/raw/phototourism/sacre-coeur",
+  "download": {
+    "filename": "sacre_coeur.tar.gz",
+    "url": "https://www.cs.ubc.ca/research/kmyi_data/imw2020/TrainingData/sacre_coeur.tar.gz"
+  },
+  "split": {
+    "kind": "nerfw",
+    "filename": "sacre.tsv",
+    "url": "https://nerf-w.github.io/data/selected_images/sacre.tsv",
+    "policy": "Keep official test membership (21 images); carve validation from official training images (950); exclude unlisted images; project full-image evaluation, not the appearance-adapted NeRF-W protocol"
+  },
+  "license": "Check source dataset and original photographer terms; no blanket image redistribution permission assumed"
+}
