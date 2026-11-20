@@ -42,3 +42,5 @@ footer { padding-top: 6px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 @media (max-width: 700px) { .workspace { grid-template-columns: 230px minmax(0, 1fr); } #panel { padding: 0 12px 12px; } header { padding: 0 14px; } .subtitle, .badge { display: none; } }
 @media (max-width: 480px) { .workspace { display: flex; flex-direction: column-reverse; height: auto; } #stage { height: 55dvh; min-height: 300px; } #panel { overflow: visible; border-right: 0; } .viewport-note { left: 12px; right: 12px; } }
+
+body[data-building="gate"] :is(#tower-details, #tower-note) { display: none; }
