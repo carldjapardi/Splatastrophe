@@ -5,7 +5,7 @@ Owner: Yushan (agent `claude-yushan-masks`). Parent: issue #1 milestone 8 (multi
 
 - `scene.json`: scene config for `pipeline/reconstruction/run.py` (no changes to the pipeline or `configs/scenes/`).
 - `colab_train.ipynb`: Colab notebook. Open it at
-  <https://colab.research.google.com/github/SriyaKan/Splatastrophe/blob/yushan/splat-experiment/experiments/reconstruction/sacre-coeur/colab_train.ipynb>
+  <https://colab.research.google.com/github/carldjapardi/Splatastrophe/blob/yushan/splat-experiment/experiments/reconstruction/sacre-coeur/colab_train.ipynb>
   with a GPU runtime and run the cells in order.
 
 Data: IMC-PT 2020 `sacre_coeur.tar.gz` (4.1 GB) with supplied COLMAP cameras, NeRF-W split
