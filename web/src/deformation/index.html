@@ -4,21 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="data:," />
-  <title>Splatastrophe · Local playground</title>
+  <title>Splatastrophe · Playground</title>
   <link rel="stylesheet" href="/src/demo/style.css" />
 </head>
 <body>
-  <header><div><span class="brand">Splatastrophe</span><span class="subtitle">Local playground</span></div><span class="badge">Synthetic study / 01</span></header>
+  <header><div><span class="brand">Splatastrophe</span><span class="subtitle">Playground</span></div></header>
   <div class="workspace">
     <aside id="panel" aria-label="Playground controls">
       <section>
         <p class="eyebrow">Scene</p>
         <label for="building">Building</label>
-        <div class="building-row"><select id="building"><option>Loading catalog…</option></select><button id="reload" type="button">Reload</button></div>
+        <div class="building-row"><select id="building"><option value="">Loading catalog…</option></select><button id="reload" type="button">Reload</button></div>
         <p id="load-status" role="status" data-state="loading">Loading building…</p>
         <p id="building-description" class="hint"></p>
         <div id="load-error" role="alert" hidden><p id="error-message"></p><button id="retry" type="button">Retry loading</button></div>
       </section>
+      <section id="gate-controls" hidden><button id="gate-reset" type="button">Reset view</button></section>
       <fieldset id="controls" disabled>
         <legend class="sr-only">Scene controls</legend>
         <section>
@@ -47,9 +48,9 @@
           <button id="measure" type="button">Record 5s FPS sample</button><p id="measurement" class="hint" role="status"></p>
         </details>
       </fieldset>
-      <footer><p class="hint">Scripted bending and toy rigid-body impact. Approximate proxy lighting. Final reconstruction adapters are deferred.</p><p id="attribution" class="hint"></p></footer>
+      <footer><p id="tower-details" class="hint">Scripted bending and toy rigid-body impact. Approximate proxy lighting. Final reconstruction adapters are deferred.</p><p id="attribution" class="hint"></p></footer>
     </aside>
-    <main id="stage" aria-label="Interactive building viewport" aria-busy="true"><canvas id="view" aria-label="Building viewer: drag to orbit, scroll to zoom"></canvas><div class="viewport-note">PROCEDURAL GAUSSIANS <span>Y ↑ · meters</span></div></main>
+    <main id="stage" aria-label="Interactive building viewport" aria-busy="true"><canvas id="view" aria-label="Building viewer: drag to orbit, scroll to zoom"></canvas><div class="viewport-note" id="tower-note">PROCEDURAL GAUSSIANS <span>Y ↑ · meters</span></div></main>
   </div>
   <script type="module" src="/src/demo/main.ts"></script>
 </body>
