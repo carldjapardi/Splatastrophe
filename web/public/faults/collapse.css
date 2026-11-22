@@ -1,0 +1,62 @@
+:root {
+  color-scheme: light;
+  font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+  color: #262a29;
+  background: #fafbf8;
+  font-size: 14px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+header {
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 24px;
+  border-bottom: 1px solid #d9ddd6;
+}
+header a { color: inherit; }
+.brand { font: 25px 'Iowan Old Style', Georgia, serif; letter-spacing: -.6px; text-decoration: none; }
+.back { color: #425047; }
+.workspace { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: calc(100dvh - 68px); }
+.panel { padding: 23px 20px; border-right: 1px solid #d9ddd6; }
+h1 { margin: 0; font: 25px 'Iowan Old Style', Georgia, serif; }
+p { line-height: 1.5; }
+.load-label { display: flex; justify-content: space-between; margin: 23px 0 5px; }
+output { color: #4a5d4e; font-variant-numeric: tabular-nums; }
+input[type='range'] { display: block; width: 100%; margin: 0 0 16px; accent-color: #4a6551; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+button { font: inherit; color: inherit; background: white; border: 1px solid #ccd3c8; border-radius: 4px; padding: 8px 10px; cursor: pointer; }
+button:hover { background: #edf2e9; }
+button:disabled { opacity: .57; cursor: default; }
+button.primary { color: #fff; background: #334b3a; border-color: #334b3a; }
+button.primary:hover:enabled { background: #415e49; }
+:focus-visible { outline: 2px solid #649677; outline-offset: 3px; }
+.hint { color: #5a665b; font-size: 12px; }
+.fault-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 420px;
+  background: radial-gradient(ellipse at 50% 40%, #253039, #15191e 70%);
+  --stone: #a4a9a4;
+  --light: #c5c8be;
+  --shade: #757f79;
+  --seam: #5a655e;
+  --ground: #24312e;
+  --grid: #3c504b;
+  --active: #f3c17e;
+}
+canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; cursor: grab; touch-action: pan-y; }
+canvas:active { cursor: grabbing; }
+canvas:focus-visible { outline-offset: -5px; }
+.fault-marker { position: absolute; inset: 0 auto auto 0; translate: -50% -50%; min-width: 36px; min-height: 36px; font-weight: 600; box-shadow: 0 2px 6px #15191e60; }
+.fault-marker[aria-pressed='true'] { background: #f3c17e; border-color: #f3c17e; color: #252721; }
+#orbit-help { position: absolute; bottom: 15px; left: 21px; margin: 0; color: #d0dbd5; pointer-events: none; font-size: 12px; }
+@media (pointer: coarse) { .fault-marker { min-width: 44px; min-height: 44px; } }
+@media (max-width: 700px) {
+  header { padding: 0 14px; }
+  .workspace { display: flex; flex-direction: column; }
+  .panel { border: 0; padding: 17px 14px; }
+  .fault-stage { min-height: clamp(295px, 74vw, 460px); }
+}

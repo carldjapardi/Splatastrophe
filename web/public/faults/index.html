@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="data:," />
+  <title>Splatastrophe · Fault-point collapse</title>
+  <link rel="stylesheet" href="/faults/collapse.css" />
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">Splatastrophe</a>
+    <a class="back" href="/">Back to playground</a>
+  </header>
+  <main id="fault-point-demo" class="workspace">
+    <aside class="panel" aria-labelledby="fault-heading">
+      <h1 id="fault-heading">Fault-point collapse</h1>
+      <p>Select points on the fictional block building and raise the tension to see the marked sections crumble.</p>
+      <div class="load-label">
+        <label for="fault-tension">Tension</label>
+        <output for="fault-tension" data-tension-value aria-hidden="true">0%</output>
+      </div>
+      <input id="fault-tension" type="range" min="0" max="100" step="1" value="0" />
+      <div class="actions">
+        <button type="button" class="primary" data-play>Play collapse</button>
+        <button type="button" data-reset>Reset building</button>
+      </div>
+      <p role="status" data-status>Intact · A and C selected</p>
+      <p class="hint">Scripted motion at a unitless tension level.</p>
+    </aside>
+    <section class="fault-stage" aria-label="Interactive building viewport">
+      <canvas role="img" tabindex="0" aria-label="A fictional block building. Drag or use the left and right arrow keys to orbit." aria-describedby="orbit-help"></canvas>
+      <button type="button" class="fault-marker" data-point="A" aria-pressed="true" aria-label="Fault A, left wall">A</button>
+      <button type="button" class="fault-marker" data-point="B" aria-pressed="false" aria-label="Fault B, upper span">B</button>
+      <button type="button" class="fault-marker" data-point="C" aria-pressed="true" aria-label="Fault C, right wall">C</button>
+      <p id="orbit-help">Drag to orbit · ← / →</p>
+    </section>
+  </main>
+  <script type="module" src="/faults/collapse.js"></script>
+</body>
+</html>
