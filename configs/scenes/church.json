@@ -19,9 +19,8 @@
   "mask_policy": "Full images, no foreground masks; background included in metrics",
   "download": {
     "filename": "Church.zip",
-    "url": "https://drive.google.com/uc?id=0B-ePgl6HF260SmhXM0czaHJ3SU0",
-    "google_drive_id": "0B-ePgl6HF260SmhXM0czaHJ3SU0",
-    "source_index": "https://raw.githubusercontent.com/IntelVCL/TanksAndTemples/master/python_toolbox/download_t2_dataset.py"
+    "url": "https://drive.usercontent.google.com/download?id=0B-ePgl6HF260SmhXM0czaHJ3SU0&resourcekey=0-Gsw54gkOI-Crg5S-9wJZpg&export=download&confirm=t",
+    "source_index": "https://www.tanksandtemples.org/download/"
   },
   "split": {
     "kind": "interleaved_disjoint",

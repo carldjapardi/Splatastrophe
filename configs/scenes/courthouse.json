@@ -19,9 +19,8 @@
   "mask_policy": "Full images, no foreground masks; background included in metrics",
   "download": {
     "filename": "Courthouse.zip",
-    "url": "https://drive.google.com/uc?id=0B-ePgl6HF260bHRNZTJnU1pWMVE",
-    "google_drive_id": "0B-ePgl6HF260bHRNZTJnU1pWMVE",
-    "source_index": "https://raw.githubusercontent.com/IntelVCL/TanksAndTemples/master/python_toolbox/download_t2_dataset.py"
+    "url": "https://drive.usercontent.google.com/download?id=0B-ePgl6HF260bHRNZTJnU1pWMVE&resourcekey=0-2CKvLKiIy9kSrxhYuw38bg&export=download&confirm=t",
+    "source_index": "https://www.tanksandtemples.org/download/"
   },
   "split": {
     "kind": "interleaved_disjoint",

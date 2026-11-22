@@ -19,9 +19,8 @@
   "mask_policy": "Full images, no foreground masks; background included in metrics",
   "download": {
     "filename": "Lighthouse.zip",
-    "url": "https://drive.google.com/uc?id=0B-ePgl6HF260dHpldktMNV9NRTA",
-    "google_drive_id": "0B-ePgl6HF260dHpldktMNV9NRTA",
-    "source_index": "https://raw.githubusercontent.com/IntelVCL/TanksAndTemples/master/python_toolbox/download_t2_dataset.py"
+    "url": "https://drive.usercontent.google.com/download?id=0B-ePgl6HF260dHpldktMNV9NRTA&resourcekey=0-I9-wwTHVT0XCe2T2aRom9w&export=download&confirm=t",
+    "source_index": "https://www.tanksandtemples.org/download/"
   },
   "split": {
     "kind": "interleaved_disjoint",
