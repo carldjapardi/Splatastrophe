@@ -30,6 +30,8 @@ def command_for(stage, cfg, root, config=None, iterations=None, stamp=None):
                     '--no-same-dimensions', '--no-use-single-camera-mode']
         else:
             cmd += ['--matching-method', cfg['matching_method']]
+            if cfg.get('colmap_gpu') is False:
+                cmd.append('--no-gpu')
         return cmd
     if stage == 'train':
         return ['ns-train', 'splatfacto', '--data', str(processed), '--output-dir', str(outputs),

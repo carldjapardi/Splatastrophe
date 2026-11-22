@@ -26,5 +26,6 @@
     "kind": "interleaved_disjoint",
     "policy": "80/10/10 by filename at eval_every=10; all images may participate in SfM"
   },
-  "license": "https://www.tanksandtemples.org/license/"
+  "license": "https://www.tanksandtemples.org/license/",
+  "colmap_gpu": false
 }

@@ -10,8 +10,12 @@ shift
 summary=outputs/spirula-batch.tsv
 mkdir -p outputs
 process_scene() {
-    local scene=$1 stage cfg="configs/scenes/$1.json"
+    local scene=$1 stage cfg="configs/scenes/$1.json" raw
+    raw=$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["raw"])' "$cfg") || return
     for stage in download process split inspect; do
+        if [[ "$stage" == download && -s "$raw/source.json" ]]; then
+            continue
+        fi
         python -m pipeline.reconstruction.run "$stage" --scene "$cfg" --execute || return
     done
     python -m pipeline.reconstruction.prepare_spirula "data/processed/$scene" "data/processed/spirula-$scene" || return
