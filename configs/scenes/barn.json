@@ -19,13 +19,13 @@
   "mask_policy": "Full images, no foreground masks; background included in metrics",
   "download": {
     "filename": "Barn.zip",
-    "url": "https://drive.google.com/uc?id=0B-ePgl6HF260NzQySklGdXZyQzA",
-    "google_drive_id": "0B-ePgl6HF260NzQySklGdXZyQzA",
-    "source_index": "https://raw.githubusercontent.com/IntelVCL/TanksAndTemples/master/python_toolbox/download_t2_dataset.py"
+    "url": "https://drive.usercontent.google.com/download?id=0B-ePgl6HF260NzQySklGdXZyQzA&resourcekey=0-luQ7Jaym5BQL6IjxsgXY9A&export=download&confirm=t",
+    "source_index": "https://www.tanksandtemples.org/download/"
   },
   "split": {
     "kind": "interleaved_disjoint",
     "policy": "80/10/10 by filename at eval_every=10; all images may participate in SfM"
   },
-  "license": "https://www.tanksandtemples.org/license/"
+  "license": "https://www.tanksandtemples.org/license/",
+  "colmap_gpu": false
 }
