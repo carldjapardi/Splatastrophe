@@ -89,7 +89,7 @@ class Reconstruction(unittest.TestCase):
         cmd = module.command_for('process', photo, Path('/persistent'))
         self.assertIn('--skip-colmap', cmd)
         self.assertIn('--skip-image-processing', cmd)
-        self.assertIn('False', cmd)
+        self.assertIn('--no-use-single-camera-mode', cmd)
         self.assertIn('/persistent/data/raw/phototourism/brandenburg-gate/dense/sparse', cmd)
         self.assertNotIn('--skip-colmap', module.command_for('process', barn, Path('/persistent')))
         self.assertEqual(module.command_for('train', barn, Path('/persistent'))[-2:], ['--downscale-factor','4'])

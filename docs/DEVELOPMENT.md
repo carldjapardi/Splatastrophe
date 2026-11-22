@@ -104,3 +104,49 @@ python3 pipeline/reconstruction/run.py process --scene configs/scenes/brandenbur
 ```
 
 Local tests use tiny synthetic metadata/archive fixtures. Passing them establishes pipeline behavior, not real camera alignment, reconstruction quality or CUDA compatibility. Never commit raw data, checkpoints, tokens or notebook outputs.
+
+### Spirula Studio landmark-quality comparison
+
+Use the reconstruction Python environment (Pillow is required) and a pinned
+Spirula binary. Stage a new dataset from the processed scene. The reported
+test images are kept for evaluation. The validation split remains separate.
+
+```bash
+python -m pipeline.reconstruction.prepare_spirula \
+  data/processed/brandenburg-gate data/processed/spirula-brandenburg-masked \
+  --masks /path/to/reviewed-mask-pngs
+scripts/train_spirula.sh /path/to/spirula data/processed/spirula-brandenburg-masked outputs/spirula-gate-masked smoke
+scripts/train_spirula.sh /path/to/spirula data/processed/spirula-brandenburg-masked outputs/spirula-gate-masked quality
+```
+
+Omit `--masks` for an unmasked comparison. In masked mode every training
+photo needs a full-resolution grayscale PNG with the same stem and values
+0 (background) and 255 (landmark). Use `--masked-subset` for the pilot when
+only a subset of reviewed masks is available. Keep original calibration and photos.
+Review gaps between columns and fine sculpture edges before committing
+to a longer run. The quality run allows up to two million splats at original
+image resolution. Report the actual count and verify the output from matching
+held-out angles. The cap does not guarantee any count or visual improvement.
+
+To generate a pilot without hand-drawn masks, install `transformers==4.51.3`
+and `timm==1.0.15` in an isolated overlay on the CUDA reconstruction
+environment. The generator uses public Grounding DINO and SAM weights.
+Only training photos are used for mask generation.
+
+```bash
+python -m pipeline.reconstruction.generate_landmark_masks \
+  data/processed/brandenburg-gate outputs/gate-mask-pilot \
+  --prompt "brandenburg gate stone monument" \
+  --detail "bronze horse chariot statue on the roof" --limit 12
+```
+
+Review `contact-sheet.jpg` and `manifest.json`. The generated PNGs are
+candidates. Coverage checks flag empty or near-full masks, but cannot detect
+mistakes such as sky between columns or a missing piece of sculpture.
+
+For a landmark whose column bases look cut off, create a separate mask set
+with `python -m pipeline.reconstruction.add_ground_strip INPUT_MASKS OUTPUT_MASKS`.
+The default strip is 3% of the landmark's visible height, capped by its
+width. It preserves the original foreground and extends only below the
+lower edge. Restage and compare at the same held-out cameras and training
+settings before selecting it for the viewer.

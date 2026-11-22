@@ -27,7 +27,7 @@ def command_for(stage, cfg, root, config=None, iterations=None, stamp=None):
                '--num-downscales', str(cfg['num_downscales']), '--sfm-tool', 'colmap']
         if cfg['camera_source'] == 'supplied_colmap':
             cmd += ['--skip-colmap', '--skip-image-processing', '--colmap-model-path', str(root / cfg['colmap_model']),
-                    '--same-dimensions', 'False', '--use-single-camera-mode', 'False']
+                    '--no-same-dimensions', '--no-use-single-camera-mode']
         else:
             cmd += ['--matching-method', cfg['matching_method']]
         return cmd
@@ -35,6 +35,7 @@ def command_for(stage, cfg, root, config=None, iterations=None, stamp=None):
         return ['ns-train', 'splatfacto', '--data', str(processed), '--output-dir', str(outputs),
                 '--experiment-name', cfg['scene_id'], '--timestamp', stamp or 'RUN_TIMESTAMP',
                 '--max-num-iterations', str(iterations or cfg['iterations']), '--vis', 'tensorboard',
+                *(['--pipeline.model.num-downscales', '0'] if cfg.get('full_resolution') else []),
                 'nerfstudio-data', '--downscale-factor', str(cfg['train_downscale_factor'])]
     if config is None:
         raise ValueError('--load-config is required; choose the exact successful training run')
@@ -101,11 +102,14 @@ def main():
     p.add_argument('--scene', type=Path, default=ROOT / 'configs/scenes/barn.json')
     p.add_argument('--data-root', type=Path, default=ROOT, help='Root for scene-relative data/outputs; use persistent disk on GPU')
     p.add_argument('--load-config', type=Path)
+    p.add_argument('--full-resolution', action='store_true', help='Disable the model resolution ramp from the first step')
     p.add_argument('--iterations', type=int, help='Explicit longer run only after reviewing the smoke baseline')
     p.add_argument('--hourly-rate', '--hourly-rate-usd', dest='hourly_rate', type=float, help='USD/hour from the provider; elapsed-time estimate only, not an invoice')
     p.add_argument('--execute', action='store_true')
     a = p.parse_args()
     cfg = json.loads(a.scene.read_text())
+    if a.full_resolution:
+        cfg.update(full_resolution=True, train_downscale_factor=1)
     root = a.data_root.resolve()
     images, processed, outputs = [root / cfg[k] for k in ('images', 'processed', 'outputs')]
     transforms = processed / 'transforms.json'
