@@ -1,13 +1,18 @@
-import { Application, Asset, Color, Entity, Vec3 } from 'playcanvas';
+import { Application, Asset, Color, Entity, FILLMODE_NONE, RESOLUTION_AUTO, Vec3 } from 'playcanvas';
 
 export async function mountGate(url: string, signal: AbortSignal) {
   const canvas = document.querySelector<HTMLCanvasElement>('#view')!;
+  const stage = canvas.parentElement!;
   const controls = new AbortController();
   const app = new Application(canvas);
   let objectUrl: string | undefined;
+  let observer: ResizeObserver | undefined;
   const dispose = () => {
     controls.abort();
+    observer?.disconnect();
     app.destroy();
+    canvas.style.removeProperty('width');
+    canvas.style.removeProperty('height');
     if (objectUrl) URL.revokeObjectURL(objectUrl);
   };
 
@@ -29,16 +34,20 @@ export async function mountGate(url: string, signal: AbortSignal) {
         focus.y + horizontal * Math.sin(yaw), focus.z + distance * Math.sin(pitch));
       camera.lookAt(focus, up);
     };
-    const resize = () => app.resizeCanvas(canvas.clientWidth, canvas.clientHeight);
+    app.graphicsDevice.maxPixelRatio = Math.min(window.devicePixelRatio, 2);
+    app.setCanvasFillMode(FILLMODE_NONE);
+    app.setCanvasResolution(RESOLUTION_AUTO);
+    const resize = () => app.resizeCanvas(stage.clientWidth, stage.clientHeight);
     const reset = () => {
       yaw = -Math.PI / 2;
       pitch = .10;
-      baseDistance = .31 * Math.max(1, canvas.clientHeight / Math.max(canvas.clientWidth, 1));
+      baseDistance = .31 * Math.max(1, stage.clientHeight / Math.max(stage.clientWidth, 1));
       distance = baseDistance;
       place();
     };
 
-    const asset = new Asset('Brandenburg Gate', 'gsplat', { url: objectUrl, filename: 'gate.ply' });
+    const filename = new URL(url, document.baseURI).pathname.split('/').pop()!;
+    const asset = new Asset('Brandenburg Gate', 'gsplat', { url: objectUrl, filename });
     app.assets.add(asset);
     await new Promise<void>((resolve, reject) => {
       const abort = () => reject(signal.reason);
@@ -49,6 +58,8 @@ export async function mountGate(url: string, signal: AbortSignal) {
     });
     signal.throwIfAborted();
     const gate = new Entity('Brandenburg Gate');
+    // The SOG bundle uses PlayCanvas's axis convention. Restore the gate orbit frame.
+    if (filename.endsWith('.sog')) gate.setLocalEulerAngles(180, 0, 0);
     gate.addComponent('gsplat', { asset });
     app.root.addChild(gate);
 
@@ -75,7 +86,8 @@ export async function mountGate(url: string, signal: AbortSignal) {
       distance = Math.max(baseDistance * .2, Math.min(baseDistance * 5, distance * Math.exp(event.deltaY * .001)));
       place();
     }, { ...options, passive: false });
-    window.addEventListener('resize', resize, options);
+    observer = new ResizeObserver(resize);
+    observer.observe(stage);
     document.querySelector('#gate-reset')!.addEventListener('click', reset, options);
     resize();
     reset();
