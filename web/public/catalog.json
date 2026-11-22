@@ -1,13 +1,119 @@
 {
   "schemaVersion": 1,
-  "buildings": [{
-    "id": "synthetic-tower",
-    "name": "Synthetic tower",
-    "description": "A procedural placeholder for testing the playground. Bend uses a scripted curve; impact uses a separate rigid block stack.",
-    "attribution": "Original Splatastrophe procedural fixture. No photographs or trained reconstruction.",
-    "fixture": "synthetic-tower",
-    "actions": ["bend", "impact"],
-    "camera": { "yaw": 0.7, "pitch": 0.42, "distance": 13, "target": [0, 2.5, 0] },
-    "light": { "position": [4, 6, 4], "target": [0, 2.5, 0], "intensity": 4, "color": "#fff3dc", "range": 24, "innerConeAngle": 30, "outerConeAngle": 55 }
-  }]
+  "buildings": [
+    {
+      "id": "brandenburg-gate",
+      "name": "Brandenburg Gate",
+      "fixture": "static-sog",
+      "description": "Photo reconstruction. Drag to orbit and scroll to zoom.",
+      "attribution": "PhotoTourism IMC-PT 2020 / Brandenburg Gate. NeRF-W split, masked Spirula reconstruction.",
+      "asset": "models/brandenburg-spirula.sog",
+      "camera": {
+        "target": [
+          0.04,
+          0.34,
+          -0.005
+        ],
+        "distance": 0.31,
+        "yaw": -1.5707963267948966,
+        "pitch": 0.1,
+        "rotationX": 180
+      }
+    },
+    {
+      "id": "trevi-fountain",
+      "name": "Trevi Fountain",
+      "fixture": "static-sog",
+      "description": "Photo reconstruction. Drag to orbit and scroll to zoom.",
+      "attribution": "PhotoTourism IMC-PT 2020 / Trevi Fountain. NeRF-W split, 2,000-step full-resolution Spirula reconstruction.",
+      "asset": "models/trevi-fountain.sog",
+      "camera": {
+        "target": [
+          0,
+          8.4,
+          0.12
+        ],
+        "distance": 13.4,
+        "yaw": -1.5707963267948966,
+        "pitch": 0.06,
+        "rotationX": -90
+      }
+    },
+    {
+      "id": "westminster",
+      "name": "Palace of Westminster",
+      "fixture": "static-sog",
+      "description": "Photo reconstruction with partial side and ground coverage. Drag to orbit and scroll to zoom.",
+      "attribution": "PhotoTourism IMC-PT 2020 / Palace of Westminster. Project holdout, 2,000-step full-resolution Spirula reconstruction.",
+      "asset": "models/westminster.sog",
+      "camera": {
+        "target": [
+          -0.7,
+          6.45,
+          -0.75
+        ],
+        "distance": 8.9,
+        "yaw": -1.72,
+        "pitch": 0.1,
+        "rotationX": -90
+      }
+    },
+    {
+      "id": "taj-mahal",
+      "name": "Taj Mahal",
+      "fixture": "static-sog",
+      "description": "Photo reconstruction with partial side and ground coverage. Drag to orbit and scroll to zoom.",
+      "attribution": "PhotoTourism IMC-PT 2020 / Taj Mahal. Project holdout, 2,000-step full-resolution Spirula reconstruction.",
+      "asset": "models/taj-mahal.sog",
+      "camera": {
+        "target": [
+          0.15,
+          10.5,
+          -0.45
+        ],
+        "distance": 6.6,
+        "yaw": -1.5707963267948966,
+        "pitch": 0.1,
+        "rotationX": -90
+      }
+    },
+    {
+      "id": "synthetic-tower",
+      "name": "Synthetic tower",
+      "description": "A procedural placeholder for testing the playground. Bend uses a scripted curve; impact uses a separate rigid block stack.",
+      "attribution": "Original Splatastrophe procedural fixture. No photographs or trained reconstruction.",
+      "fixture": "synthetic-tower",
+      "actions": [
+        "bend",
+        "impact"
+      ],
+      "camera": {
+        "yaw": 0.7,
+        "pitch": 0.42,
+        "distance": 13,
+        "target": [
+          0,
+          2.5,
+          0
+        ]
+      },
+      "light": {
+        "position": [
+          4,
+          6,
+          4
+        ],
+        "target": [
+          0,
+          2.5,
+          0
+        ],
+        "intensity": 4,
+        "color": "#fff3dc",
+        "range": 24,
+        "innerConeAngle": 30,
+        "outerConeAngle": 55
+      }
+    }
+  ]
 }

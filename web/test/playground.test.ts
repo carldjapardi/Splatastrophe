@@ -34,28 +34,37 @@ describe('viewer mount defaults', () => {
   });
 });
 
-describe('synthetic catalog', () => {
+describe('building catalog', () => {
   it('loads the fixture, camera, supported actions and independent light/aim defaults', () => {
-    const [entry] = parseCatalog(catalog);
+    const entry = parseCatalog(catalog).find(value => value.fixture === 'synthetic-tower')!;
     expect(entry.actions).toEqual(['bend', 'impact']);
     expect(entry.camera.distance).toBeGreaterThan(0);
     expect(entry.light.position).not.toEqual(entry.light.target);
     expect(entry.fixture).toBe('synthetic-tower');
   });
 
-  it('rejects unsupported real assets and invalid configurations before scene creation', () => {
-    const unknown = structuredClone(catalog);
-    unknown.buildings[0].fixture = 'barn.ply';
-    expect(() => parseCatalog(unknown)).toThrow(/adapters are deferred/);
+  it('loads camera presets for local landmark assets and rejects unsupported paths', () => {
+    const entries = parseCatalog(catalog);
+    expect(entries[0]).toMatchObject({ id: 'brandenburg-gate', fixture: 'static-sog', camera: { distance: .31 } });
+    expect(entries.filter(value => value.fixture === 'static-sog').map(entry => entry.id)).toEqual([
+      'brandenburg-gate', 'trevi-fountain', 'westminster', 'taj-mahal',
+    ]);
+    const landmark = catalog.buildings[0];
+    for (const asset of ['https://example.com/trevi.sog', 'models/../trevi.sog', 'models/trevi.ply']) {
+      expect(() => parseCatalog({ schemaVersion: 1, buildings: [{ ...landmark, asset }] })).toThrow(/SOG path/);
+    }
+  });
+
+  it('rejects unsupported fixtures, duplicate IDs and invalid synthetic settings', () => {
+    const tower = catalog.buildings.find(value => value.fixture === 'synthetic-tower')!;
+    expect(() => parseCatalog({ schemaVersion: 1, buildings: [{ ...tower, fixture: 'barn.ply' }] })).toThrow(/Unsupported fixture/);
     const duplicate = structuredClone(catalog);
     duplicate.buildings.push(duplicate.buildings[0]);
     expect(() => parseCatalog(duplicate)).toThrow(/Duplicate/);
-    const invalid = structuredClone(catalog);
-    invalid.buildings[0].camera.distance = NaN;
-    expect(() => parseCatalog(invalid)).toThrow(/camera.distance/);
-    const coincident = structuredClone(catalog);
-    coincident.buildings[0].light.target = coincident.buildings[0].light.position;
-    expect(() => parseCatalog(coincident)).toThrow(/must differ/);
+    const invalid = { ...tower, camera: { ...tower.camera, distance: NaN } };
+    expect(() => parseCatalog({ schemaVersion: 1, buildings: [invalid] })).toThrow(/camera.distance/);
+    const coincident = { ...tower, light: { ...tower.light, target: tower.light!.position } };
+    expect(() => parseCatalog({ schemaVersion: 1, buildings: [coincident] })).toThrow(/must differ/);
   });
 });
 

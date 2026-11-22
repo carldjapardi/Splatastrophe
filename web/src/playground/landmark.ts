@@ -1,6 +1,7 @@
 import { Application, Asset, Color, Entity, FILLMODE_NONE, RESOLUTION_AUTO, Vec3 } from 'playcanvas';
+import type { LandmarkEntry } from './catalog';
 
-export async function mountGate(url: string, signal: AbortSignal) {
+export async function mountLandmark(entry: LandmarkEntry, signal: AbortSignal) {
   const canvas = document.querySelector<HTMLCanvasElement>('#view')!;
   const stage = canvas.parentElement!;
   const controls = new AbortController();
@@ -17,15 +18,16 @@ export async function mountGate(url: string, signal: AbortSignal) {
   };
 
   try {
-    const response = await fetch(url, { signal });
-    if (!response.ok) throw new Error(`Brandenburg Gate download failed (HTTP ${response.status})`);
+    const response = await fetch(`${import.meta.env.BASE_URL}${entry.asset}`, { signal });
+    if (!response.ok) throw new Error(`${entry.name} download failed (HTTP ${response.status})`);
     objectUrl = URL.createObjectURL(await response.blob());
     signal.throwIfAborted();
 
+    const preset = entry.camera;
     const camera = new Entity('Orbit camera');
-    camera.addComponent('camera', { clearColor: new Color(.08, .095, .125), nearClip: .004, farClip: 10 });
+    camera.addComponent('camera', { clearColor: new Color(.08, .095, .125), nearClip: preset.distance / 75, farClip: preset.distance * 34 });
     app.root.addChild(camera);
-    const focus = new Vec3(.04, .34, -.005);
+    const focus = new Vec3(...preset.target);
     const up = new Vec3(0, 0, 1);
     let yaw = 0, pitch = 0, distance = 0, baseDistance = 0;
     const place = () => {
@@ -39,15 +41,15 @@ export async function mountGate(url: string, signal: AbortSignal) {
     app.setCanvasResolution(RESOLUTION_AUTO);
     const resize = () => app.resizeCanvas(stage.clientWidth, stage.clientHeight);
     const reset = () => {
-      yaw = -Math.PI / 2;
-      pitch = .10;
-      baseDistance = .31 * Math.max(1, stage.clientHeight / Math.max(stage.clientWidth, 1));
+      yaw = preset.yaw;
+      pitch = preset.pitch;
+      baseDistance = preset.distance * Math.max(1, stage.clientHeight / Math.max(stage.clientWidth, 1));
       distance = baseDistance;
       place();
     };
 
-    const filename = new URL(url, document.baseURI).pathname.split('/').pop()!;
-    const asset = new Asset('Brandenburg Gate', 'gsplat', { url: objectUrl, filename });
+    const filename = entry.asset.slice(entry.asset.lastIndexOf('/') + 1);
+    const asset = new Asset(entry.name, 'gsplat', { url: objectUrl, filename });
     app.assets.add(asset);
     await new Promise<void>((resolve, reject) => {
       const abort = () => reject(signal.reason);
@@ -57,11 +59,10 @@ export async function mountGate(url: string, signal: AbortSignal) {
       app.assets.load(asset);
     });
     signal.throwIfAborted();
-    const gate = new Entity('Brandenburg Gate');
-    // The SOG bundle uses PlayCanvas's axis convention. Restore the gate orbit frame.
-    if (filename.endsWith('.sog')) gate.setLocalEulerAngles(180, 0, 0);
-    gate.addComponent('gsplat', { asset });
-    app.root.addChild(gate);
+    const landmark = new Entity(entry.name);
+    landmark.setLocalEulerAngles(preset.rotationX, 0, 0);
+    landmark.addComponent('gsplat', { asset });
+    app.root.addChild(landmark);
 
     const options = { signal: controls.signal };
     let pointer: { id: number; x: number; y: number } | undefined;
@@ -88,7 +89,7 @@ export async function mountGate(url: string, signal: AbortSignal) {
     }, { ...options, passive: false });
     observer = new ResizeObserver(resize);
     observer.observe(stage);
-    document.querySelector('#gate-reset')!.addEventListener('click', reset, options);
+    document.querySelector('#landmark-reset')!.addEventListener('click', reset, options);
     resize();
     reset();
     app.start();
