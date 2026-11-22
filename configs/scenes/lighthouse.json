@@ -1,0 +1,31 @@
+{
+  "scene_id": "lighthouse",
+  "source": "https://www.tanksandtemples.org/download/",
+  "dataset": "Tanks and Temples intermediate / Lighthouse",
+  "images": "data/raw/lighthouse/images",
+  "processed": "data/processed/lighthouse",
+  "outputs": "outputs/lighthouse",
+  "camera_provenance": "COLMAP estimated from supplied images; all views used for pose estimation",
+  "scale": "Uncalibrated reconstruction units; align and establish meters before physics",
+  "attribution": "Knapitsch et al., Tanks and Temples, SIGGRAPH 2017; see dataset terms",
+  "eval_every": 10,
+  "iterations": 1000,
+  "release": "Official intermediate image set, Lighthouse.zip",
+  "raw": "data/raw/lighthouse",
+  "camera_source": "estimate_colmap",
+  "matching_method": "sequential",
+  "num_downscales": 3,
+  "train_downscale_factor": 4,
+  "mask_policy": "Full images, no foreground masks; background included in metrics",
+  "download": {
+    "filename": "Lighthouse.zip",
+    "url": "https://drive.google.com/uc?id=0B-ePgl6HF260dHpldktMNV9NRTA",
+    "google_drive_id": "0B-ePgl6HF260dHpldktMNV9NRTA",
+    "source_index": "https://raw.githubusercontent.com/IntelVCL/TanksAndTemples/master/python_toolbox/download_t2_dataset.py"
+  },
+  "split": {
+    "kind": "interleaved_disjoint",
+    "policy": "80/10/10 by filename at eval_every=10; all images may participate in SfM"
+  },
+  "license": "https://www.tanksandtemples.org/license/"
+}

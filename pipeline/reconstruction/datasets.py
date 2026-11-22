@@ -74,28 +74,29 @@ def download_dataset(cfg, root):
         import gdown  # Already a Nerfstudio dependency; only needed on the compute machine.
         result = gdown.download(id=download['google_drive_id'], output=str(partial), quiet=False)
         if not result:
-            raise RuntimeError('Google Drive download failed; use the official Barn image-set link')
+            raise RuntimeError('Google Drive download failed; use the official image-set link')
     else:
         with urllib.request.urlopen(download['url'], timeout=60) as source, partial.open('xb') as output:
             shutil.copyfileobj(source, output, 1024 * 1024)
     partial.rename(archive)
     digest = sha256(archive)
     extract_archive(archive, raw / 'extracted')
-    if cfg['scene_id'] == 'barn':
+    if cfg['camera_source'] == 'estimate_colmap':
         candidates = [p for p in [raw / 'extracted', *(raw / 'extracted').rglob('*')] if p.is_dir() and image_files(p)]
-        # Official ZIP normally has one Barn/ directory with its frames directly inside.
+        # Official ZIP normally contains one directory with its frames directly inside.
         leaves = [p for p in candidates if any(f.parent == p for f in image_files(p))]
         if len(leaves) != 1:
-            raise ValueError('Expected one Barn image directory; inspect extracted archive before proceeding')
+            raise ValueError('Expected one Tanks and Temples image directory; inspect extracted archive before proceeding')
         shutil.copytree(leaves[0], root / cfg['images'])
     else:
         candidates = [p for p in (raw / 'extracted').rglob('dense') if (p / 'images').is_dir() and (p / 'sparse').is_dir()]
         if len(candidates) != 1:
             raise ValueError('Expected one PhotoTourism dense/images + dense/sparse directory')
         shutil.move(str(candidates[0]), str(raw / 'dense'))
-        split = raw / cfg['split']['filename']
-        with urllib.request.urlopen(cfg['split']['url'], timeout=60) as source, split.open('xb') as output:
-            shutil.copyfileobj(source, output)
+        if cfg['split']['kind'] == 'nerfw':
+            split = raw / cfg['split']['filename']
+            with urllib.request.urlopen(cfg['split']['url'], timeout=60) as source, split.open('xb') as output:
+                shutil.copyfileobj(source, output)
     evidence = {'scene_id': cfg['scene_id'], 'dataset': cfg['dataset'], 'release': cfg['release'],
                 'retrieved_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 'download': download, 'archive_sha256': digest, 'archive_bytes': archive.stat().st_size,

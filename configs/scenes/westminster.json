@@ -1,0 +1,29 @@
+{
+  "scene_id": "westminster",
+  "source": "https://www.cs.ubc.ca/~kmyi/imw2020/data.html",
+  "dataset": "PhotoTourism IMC-PT 2020 / Palace of Westminster",
+  "images": "data/raw/phototourism/westminster/dense/images",
+  "processed": "data/processed/westminster",
+  "outputs": "outputs/westminster",
+  "camera_provenance": "Reuse supplied IMC-PT dense/sparse COLMAP cameras and sparse points; all-view SfM provenance; per-image intrinsics retained, no fresh pose estimation",
+  "scale": "Uncalibrated reconstruction units; align and establish meters before physics",
+  "attribution": "Snavely et al., Photo Tourism, SIGGRAPH 2006; IMC-PT 2020 collection; original photographer rights apply",
+  "eval_every": 10,
+  "iterations": 1000,
+  "release": "IMC-PT 2020 Palace of Westminster archive in training format; hash recorded at download",
+  "raw": "data/raw/phototourism/westminster",
+  "camera_source": "supplied_colmap",
+  "num_downscales": 0,
+  "train_downscale_factor": 1,
+  "mask_policy": "Unmasked smoke baseline; review generated landmark masks before a production candidate",
+  "download": {
+    "filename": "palace_of_westminster.tar.gz",
+    "url": "https://www.cs.ubc.ca/research/kmyi_data/imw2020/TrainingData/palace_of_westminster.tar.gz"
+  },
+  "split": {
+    "kind": "interleaved_disjoint",
+    "policy": "80/10/10 by filename at eval_every=10; supplied SfM uses all registered images"
+  },
+  "license": "Check source dataset and original photographer terms; no blanket image redistribution permission assumed",
+  "colmap_model": "data/raw/phototourism/westminster/dense/sparse"
+}

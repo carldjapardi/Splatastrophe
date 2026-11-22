@@ -150,3 +150,9 @@ The default strip is 3% of the landmark's visible height, capped by its
 width. It preserves the original foreground and extends only below the
 lower edge. Restage and compare at the same held-out cameras and training
 settings before selecting it for the viewer.
+
+From the repository root, run `scripts/batch_spirula.sh SPIRULA_BINARY SCENE_ID ...`
+for a serial batch of smoke tests. The batch records per-scene logs and exports
+in `outputs/`. PhotoTourism scenes reuse supplied COLMAP poses. Tanks and
+Temples scenes estimate poses from the official image sets. Promote a scene
+to full training only after checking alignment and held-out renders.
