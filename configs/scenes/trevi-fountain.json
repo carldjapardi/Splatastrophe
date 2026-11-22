@@ -1,0 +1,31 @@
+{
+  "scene_id": "trevi-fountain",
+  "source": "https://www.cs.ubc.ca/~kmyi/imw2020/data.html",
+  "dataset": "PhotoTourism IMC-PT 2020 / Trevi Fountain with NeRF-W image membership",
+  "images": "data/raw/phototourism/trevi-fountain/dense/images",
+  "processed": "data/processed/trevi-fountain",
+  "outputs": "outputs/trevi-fountain",
+  "camera_provenance": "Reuse supplied IMC-PT dense/sparse COLMAP cameras and sparse points; all-view SfM provenance; per-image intrinsics retained, no fresh pose estimation",
+  "scale": "Uncalibrated reconstruction units; align and establish meters before physics",
+  "attribution": "Snavely et al., Photo Tourism, SIGGRAPH 2006; IMC-PT 2020 collection; Martin-Brualla et al., NeRF-W, CVPR 2021 split; original photographer rights apply",
+  "eval_every": 10,
+  "iterations": 1000,
+  "release": "IMC-PT 2020 trevi_fountain.tar.gz; NeRF-W selected_images/trevi.tsv; hashes recorded at download",
+  "raw": "data/raw/phototourism/trevi-fountain",
+  "camera_source": "supplied_colmap",
+  "num_downscales": 0,
+  "train_downscale_factor": 1,
+  "mask_policy": "Unmasked smoke baseline; review generated landmark masks before a production candidate",
+  "download": {
+    "filename": "trevi_fountain.tar.gz",
+    "url": "https://www.cs.ubc.ca/research/kmyi_data/imw2020/TrainingData/trevi_fountain.tar.gz"
+  },
+  "split": {
+    "kind": "nerfw",
+    "filename": "trevi.tsv",
+    "url": "https://nerf-w.github.io/data/selected_images/trevi.tsv",
+    "policy": "Keep official test membership; carve validation from official training images; exclude unlisted images; project full-image evaluation, not official appearance-adapted benchmark"
+  },
+  "license": "Check source dataset and original photographer terms; no blanket image redistribution permission assumed",
+  "colmap_model": "data/raw/phototourism/trevi-fountain/dense/sparse"
+}
