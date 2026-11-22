@@ -1,0 +1,329 @@
+{
+  "issue": 21,
+  "date": "2026-11-21",
+  "source": "https://www.cs.ubc.ca/~kmyi/imw2020/data.html",
+  "engine": "Spirula Studio v2026.11.12 built with CUDA 12.6",
+  "gpu": "NVIDIA L40",
+  "training": {
+    "preset": "in-the-wild",
+    "num_iterations": 2000,
+    "train_resolution_divisor": 1,
+    "steps_per_save": 2000,
+    "sampling_seed": 0,
+    "masked": false
+  },
+  "baseline": {
+    "num_iterations": 500,
+    "train_resolution_divisor": 2,
+    "masked": false
+  },
+  "evaluation": {
+    "held_out_mode": "filename",
+    "eval_align": false,
+    "eval_lpips": false,
+    "metrics": "Full-frame PSNR and SSIM on the listed held-out views before browser crop and export."
+  },
+  "browser_export": {
+    "converter": "PlayCanvas splat-transform 3.12.0",
+    "sh_iterations": 4,
+    "sh_palette_size": 8192,
+    "format": "SOG v3",
+    "background_refinement": "pipeline/reconstruction/refine_sog.py"
+  },
+  "scenes": {
+    "trevi-fountain": {
+      "scene_config": "configs/scenes/trevi-fountain.json",
+      "source_archive": "trevi_fountain.tar.gz",
+      "camera_provenance": "supplied_colmap",
+      "split_manifest_sha256": "e3cb6f4d56ea68e8a12e21d9164d8426543f36570386d9f099edde5b77ba4cb4",
+      "training_views_loaded": 1542,
+      "max_splats": 700000,
+      "trained_splats": 700000,
+      "baseline": {
+        "avg_psnr": 17.8131,
+        "avg_ssim": 0.712278,
+        "num_eval_images": 19,
+        "training_time": 24.2036
+      },
+      "full_resolution": {
+        "avg_psnr": 17.8879,
+        "avg_ssim": 0.710275,
+        "num_eval_images": 19,
+        "training_time": 71.447
+      },
+      "browser": {
+        "asset": "web/public/models/trevi-fountain.sog",
+        "crop_bounds": [
+          -8.5,
+          -4.8,
+          3.8,
+          8.6,
+          3.3,
+          12.4
+        ],
+        "opacity_profile": {
+          "rotate_x_180": false,
+          "support": {
+            "min_alpha": 0.068,
+            "max_sigma": 0.041,
+            "neighbors": 3
+          },
+          "suppress": [
+            {
+              "regions": [
+                [
+                  [
+                    -10,
+                    -6,
+                    3
+                  ],
+                  [
+                    10,
+                    -1.4,
+                    14
+                  ]
+                ],
+                [
+                  [
+                    -9,
+                    -6,
+                    9.5
+                  ],
+                  [
+                    10,
+                    5,
+                    14
+                  ]
+                ]
+              ],
+              "min_sigma": 0.105,
+              "max_alpha": 1.57,
+              "support_distance": [
+                0.045,
+                0.21
+              ],
+              "sigma_ramp": 0.125,
+              "max_reduction": 0.995
+            },
+            {
+              "regions": [
+                [
+                  [
+                    -10,
+                    -6,
+                    3
+                  ],
+                  [
+                    10,
+                    -1.15,
+                    14
+                  ]
+                ]
+              ],
+              "min_sigma": 0.022,
+              "max_alpha": 1.57,
+              "min_blue_excess": 0.07,
+              "support_distance": [
+                0.01,
+                0.06
+              ],
+              "sigma_ramp": 0.045,
+              "max_reduction": 0.99
+            }
+          ]
+        },
+        "model_sha256": "23a288d123880010fe1907824487adc5c1dcf7c81bdee87dbdc8dec2ff013f7e",
+        "count": 638236,
+        "limitations": "Residual haze near the roof and sides."
+      }
+    },
+    "westminster": {
+      "scene_config": "configs/scenes/westminster.json",
+      "source_archive": "palace_of_westminster.tar.gz",
+      "camera_provenance": "supplied_colmap",
+      "split_manifest_sha256": "046e6f553a93f07adad977ece4b9e912ca3bf30225fbc547b0a0e602d585308c",
+      "training_views_loaded": 787,
+      "max_splats": 400000,
+      "trained_splats": 229401,
+      "baseline": {
+        "avg_psnr": 15.8785,
+        "avg_ssim": 0.69396,
+        "num_eval_images": 98,
+        "training_time": 22.7771
+      },
+      "full_resolution": {
+        "avg_psnr": 16.7841,
+        "avg_ssim": 0.73789,
+        "num_eval_images": 98,
+        "training_time": 36.3241
+      },
+      "browser": {
+        "asset": "web/public/models/westminster.sog",
+        "crop_bounds": [
+          -6.5,
+          -1.5,
+          1,
+          4.4,
+          3,
+          15
+        ],
+        "opacity_profile": {
+          "rotate_x_180": false,
+          "support": {
+            "min_alpha": 0.068,
+            "max_sigma": 0.028,
+            "neighbors": 3
+          },
+          "suppress": [
+            {
+              "regions": [
+                [
+                  [
+                    -10,
+                    -5,
+                    0
+                  ],
+                  [
+                    10,
+                    5,
+                    18
+                  ]
+                ]
+              ],
+              "min_sigma": 0.055,
+              "max_alpha": 1.57,
+              "support_distance": [
+                0.021,
+                0.095
+              ],
+              "sigma_ramp": 0.07,
+              "max_reduction": 0.999
+            },
+            {
+              "regions": [
+                [
+                  [
+                    -9,
+                    -4,
+                    1
+                  ],
+                  [
+                    7,
+                    1.2,
+                    17
+                  ]
+                ]
+              ],
+              "min_sigma": 0.014,
+              "max_alpha": 1.57,
+              "min_blue_excess": 0.018,
+              "support_distance": [
+                0.008,
+                0.038
+              ],
+              "sigma_ramp": 0.03,
+              "max_reduction": 0.99
+            }
+          ]
+        },
+        "model_sha256": "813b0905d0365b6b0de7bb768e7c76829c9a0a9b128646d4a74c215a63f31421",
+        "count": 192692,
+        "limitations": "Residual skyline haze and partial ground and side coverage."
+      }
+    },
+    "taj-mahal": {
+      "scene_config": "configs/scenes/taj-mahal.json",
+      "source_archive": "taj_mahal.tar.gz",
+      "camera_provenance": "supplied_colmap",
+      "split_manifest_sha256": "14e6c6418570b92c798cff9990a516e7c5842731c62a01ead255d11bc743dde9",
+      "training_views_loaded": 1050,
+      "max_splats": 400000,
+      "trained_splats": 182012,
+      "baseline": {
+        "avg_psnr": 15.7393,
+        "avg_ssim": 0.693218,
+        "num_eval_images": 131,
+        "training_time": 15.1467
+      },
+      "full_resolution": {
+        "avg_psnr": 16.2985,
+        "avg_ssim": 0.738187,
+        "num_eval_images": 131,
+        "training_time": 24.396
+      },
+      "browser": {
+        "asset": "web/public/models/taj-mahal.sog",
+        "crop_bounds": [
+          -2.7,
+          -0.9,
+          4,
+          2.9,
+          2.5,
+          15.2
+        ],
+        "opacity_profile": {
+          "rotate_x_180": false,
+          "support": {
+            "min_alpha": 0.068,
+            "max_sigma": 0.026,
+            "neighbors": 3
+          },
+          "suppress": [
+            {
+              "regions": [
+                [
+                  [
+                    -5,
+                    -5,
+                    1
+                  ],
+                  [
+                    5,
+                    5,
+                    18
+                  ]
+                ]
+              ],
+              "min_sigma": 0.05,
+              "max_alpha": 1.57,
+              "support_distance": [
+                0.021,
+                0.095
+              ],
+              "sigma_ramp": 0.07,
+              "max_reduction": 0.999
+            },
+            {
+              "regions": [
+                [
+                  [
+                    -5,
+                    -5,
+                    2
+                  ],
+                  [
+                    5,
+                    1.5,
+                    17
+                  ]
+                ]
+              ],
+              "min_sigma": 0.014,
+              "max_alpha": 1.57,
+              "min_blue_excess": 0.018,
+              "support_distance": [
+                0.008,
+                0.038
+              ],
+              "sigma_ramp": 0.03,
+              "max_reduction": 0.99
+            }
+          ]
+        },
+        "model_sha256": "b256af5703d281618d5eaa6d697ca6ac63dede3fa58d3a736710dd489f20c56d",
+        "count": 73757,
+        "limitations": "Residual haze, especially near the minarets, and partial ground and side coverage."
+      }
+    }
+  }
+}

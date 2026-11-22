@@ -5,6 +5,7 @@ html, body { margin: 0; width: 100%; height: 100%; }
 header { height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: #fafbf8; border-bottom: 1px solid #d9ddd6; }
 .brand { font: 25px 'Iowan Old Style', Georgia, serif; letter-spacing: -.6px; }
 .subtitle { margin-left: 20px; color: #717871; font-size: 12px; }
+.header-link { color: #425047; font-size: 12px; }
 .badge { color: #5c665c; font: 10px ui-monospace, monospace; letter-spacing: 1.3px; text-transform: uppercase; }
 .workspace { display: grid; grid-template-columns: 300px minmax(0, 1fr); height: calc(100dvh - 68px); }
 #panel { background: #fafbf8; border-right: 1px solid #d9ddd6; overflow-y: auto; padding: 0 20px 20px; }
@@ -43,4 +44,4 @@ footer { padding-top: 6px; }
 @media (max-width: 700px) { .workspace { grid-template-columns: 230px minmax(0, 1fr); } #panel { padding: 0 12px 12px; } header { padding: 0 14px; } .subtitle, .badge { display: none; } }
 @media (max-width: 480px) { .workspace { display: flex; flex-direction: column-reverse; height: auto; } #stage { height: 55dvh; min-height: 300px; } #panel { overflow: visible; border-right: 0; } .viewport-note { left: 12px; right: 12px; } }
 
-body[data-building="gate"] :is(#tower-details, #tower-note) { display: none; }
+body[data-building="landmark"] :is(#tower-details, #tower-note) { display: none; }
