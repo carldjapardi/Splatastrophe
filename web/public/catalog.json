@@ -78,6 +78,44 @@
       }
     },
     {
+      "id": "reichstag",
+      "name": "Reichstag Building",
+      "fixture": "static-sog",
+      "description": "The crop keeps the dome and towers. Fading broad sky splats reduces haze, and higher opacity on dense stonework makes the facade clearer. Rear coverage is limited.",
+      "attribution": "PhotoTourism IMC-PT 2020 / Reichstag. Project holdout, 3,000-step full-resolution Spirula reconstruction.",
+      "asset": "models/reichstag.sog",
+      "camera": {
+        "target": [
+          0,
+          9.9,
+          0
+        ],
+        "distance": 12.5,
+        "yaw": -1.5707963267948966,
+        "pitch": 0.06,
+        "rotationX": -90
+      }
+    },
+    {
+      "id": "nara-temple",
+      "name": "Tōdai-ji (Nara)",
+      "fixture": "static-sog",
+      "description": "The crop preserves both gold roof ornaments and removes most of the courtyard. Sky haze was reduced and dense detail on the Great Buddha Hall was made more opaque. Rear coverage is limited.",
+      "attribution": "PhotoTourism IMC-PT 2020 / Temple in Nara. Project holdout, 6,000-step full-resolution Spirula reconstruction.",
+      "asset": "models/nara-temple.sog",
+      "camera": {
+        "target": [
+          1.8,
+          13,
+          -0.35
+        ],
+        "distance": 15,
+        "yaw": -1.5707963267948966,
+        "pitch": 0.08,
+        "rotationX": -90
+      }
+    },
+    {
       "id": "synthetic-tower",
       "name": "Synthetic tower",
       "description": "A procedural placeholder for testing the playground. Bend uses a scripted curve; impact uses a separate rigid block stack.",
