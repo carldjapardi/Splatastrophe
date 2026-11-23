@@ -18,6 +18,12 @@
         "yaw": -1.5707963267948966,
         "pitch": 0.1,
         "rotationX": 180
+      },
+      "motion": {
+        "base": [0.038, 0.332, -0.09],
+        "halfWidth": 0.091,
+        "halfDepth": 0.025,
+        "bounceHeight": 0.036
       }
     },
     {

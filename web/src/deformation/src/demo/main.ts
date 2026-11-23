@@ -8,6 +8,7 @@ const reload = required<HTMLButtonElement>('reload');
 const retry = required<HTMLButtonElement>('retry');
 const controls = required<HTMLFieldSetElement>('controls');
 const landmarkControls = required<HTMLElement>('landmark-controls');
+const landmarkMotion = required<HTMLElement>('landmark-motion');
 const status = required<HTMLElement>('load-status');
 const errorBox = required<HTMLElement>('load-error');
 const errorText = required<HTMLElement>('error-message');
@@ -15,7 +16,7 @@ const description = required<HTMLElement>('building-description');
 const attribution = required<HTMLElement>('attribution');
 const events = new AbortController();
 const options = { signal: events.signal };
-const loader = createSceneLoader<{ landmark: boolean; dispose(): void }>();
+const loader = createSceneLoader<{ landmark: boolean; motion: boolean; dispose(): void }>();
 let sequence = 0;
 
 async function load() {
@@ -40,12 +41,13 @@ async function load() {
       if (entry.fixture === 'static-sog') return { landmark: true, ...await mountLandmark(entry, signal) };
       const fixture = await loadFixture(entry, signal);
       const viewer = await mountViewer(entry, fixture, signal);
-      return { landmark: false, dispose: () => viewer.dispose() };
+      return { landmark: false, motion: false, dispose: () => viewer.dispose() };
     });
     if (!viewer || request !== sequence) return;
     controls.disabled = viewer.landmark;
     controls.hidden = viewer.landmark;
     landmarkControls.hidden = !viewer.landmark;
+    landmarkMotion.hidden = !viewer.motion;
     document.body.dataset.building = viewer.landmark ? 'landmark' : 'tower';
     status.textContent = viewer.landmark ? 'Ready · Gaussian reconstruction' : 'Ready · procedural fixture';
     status.dataset.state = 'ready';

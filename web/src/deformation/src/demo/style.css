@@ -23,6 +23,8 @@ button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-v
 .building-row select { min-width: 0; flex: 1; }
 .row button { flex: 1; }
 .row { margin-bottom: 14px; }
+#landmark-motion { margin-bottom: 8px; }
+#landmark-motion .row, #landmark-motion .hint { margin: 0 0 8px; }
 #controls { border: 0; padding: 0; margin: 0; min-width: 0; }
 #load-status { font-size: 11px; color: #667262; margin: 10px 0; }
 #load-status[data-state=error], #load-error { color: #93483e; }
