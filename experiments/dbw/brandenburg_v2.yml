@@ -1,0 +1,59 @@
+# v2: gate-centred crop + gate masks (silhouette loss), weaker parsimony, blocks initialised over the gate.
+# Needs dbw_masks.patch (mask_weight, mask_bkg_weight, T_center, T_ground_y) and a dataset prepared with
+# prep_phototourism.py --crop gate --masks ... (tag brandenburg_v2).
+dataset:
+  name: phototourism
+  tag: brandenburg_v2
+model:
+  name: dbw
+  mesh:
+    n_blocks: 12
+    S_world: 1
+    R_world: [0, 0, 0]
+    T_world: [0, 0, 0]
+    txt_size: 256
+    # gate spans roughly x [-1.0, 1.0], y [-0.9, 0.55], z [-0.45, 0.23] in the prep frame (sparse "core" points
+    # cover only x [-0.62, 0.6]; the width comes from the masks)
+    T_init_mode: uni
+    T_range: [0.9, 0.7, 0.3]
+    T_center: [0, -0.2, -0.1]
+    T_ground_y: -0.9
+  renderer:
+    faces_per_pixel: 10
+    cameras:
+      name: perspective
+    detach_bary: True
+    z_clip: 0.001
+  rend_optim:
+    coarse_learning: 300   # epoch milestones scaled x2.4 from v1: 268 views = 67 iters/epoch, ~25.5k iters total like v1
+    decimate_txt: 150
+    decimate_factor: 8
+    kill_blocks: True
+    decouple_rendering: True
+    opacity_noise: True
+  loss:
+    rgb_weight: 1
+    perceptual_weight: 0.1
+    parsimony_weight: 0.002
+    tv_weight: 0.1
+    overlap_weight: 1
+    mask_weight: 1
+    mask_bkg_weight: 0.5
+training:
+  batch_size: 4
+  n_workers: 4
+  optimizer:
+    name: adam
+    lr: 5.0e-3
+    texture:
+      lr: 5.0e-2
+  scheduler:
+    name: multi_step
+    gamma: [0.1, 0.1]
+    milestones: [360]
+  n_epoches: 380
+  train_stat_interval: 50
+  val_stat_interval: 100
+  seed: 222213
+  visualizer_port:
+  resume:

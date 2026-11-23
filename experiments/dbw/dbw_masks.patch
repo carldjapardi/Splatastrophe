@@ -1,0 +1,93 @@
+diff --git a/src/model/dbw.py b/src/model/dbw.py
+index 3a58c80..2c5f1c4 100644
+--- a/src/model/dbw.py
++++ b/src/model/dbw.py
+@@ -68,6 +68,8 @@ class DifferentiableBlocksWorld(nn.Module):
+         opacity_init = kwargs.pop('opacity_init', 0.5)
+         T_range = kwargs.pop('T_range', [1, 1, 1])
+         T_init_mode = kwargs.pop('T_init_mode', 'gauss')
++        T_center = torch.Tensor(kwargs.pop('T_center', [0., 0., 0.]))  # center of the block init region
++        T_ground_y = kwargs.pop('T_ground_y', -0.9 * T_range[1])  # initial ground height
+         assert len(kwargs) == 0, kwargs
+ 
+         # Build spherical background and planar ground
+@@ -97,7 +99,7 @@ class DifferentiableBlocksWorld(nn.Module):
+ 
+         # Initialize learnable pose parameters
+         self.R_6d_ground = nn.Parameter(torch.Tensor([[1., 0., 0., 0., 1., 0.]]))
+-        self.T_ground = nn.Parameter(torch.Tensor([[0., -0.9 * T_range[1], 0.]]))
++        self.T_ground = nn.Parameter(torch.Tensor([[0., T_ground_y, 0.]]))
+         N = self.n_blocks
+         S_init = (torch.rand(N, 3) + 0.5 - self.scale_min).log()
+         R_6d_init = matrix_to_rotation_6d(random_rotations(N))
+@@ -107,6 +109,7 @@ class DifferentiableBlocksWorld(nn.Module):
+             T_init = (2 * torch.rand(N, 3) - 1) * torch.Tensor(T_range)
+         else:
+             raise NotImplementedError
++        T_init = T_init + T_center
+         self.S = nn.Parameter(S_init.clone())
+         self.R_6d = nn.Parameter(R_6d_init.clone())
+         self.T = nn.Parameter(T_init.clone())
+@@ -150,7 +153,10 @@ class DifferentiableBlocksWorld(nn.Module):
+             'scale': kwargs.pop('scale_weight', 0),
+             'tv': kwargs.pop('tv_weight', 0),
+             'overlap': kwargs.pop('overlap_weight', 0),
++            'mask': kwargs.pop('mask_weight', 0),
+         }
++        # weight of background pixels in the silhouette loss (gate pixels have weight 1, ignored pixels 0)
++        self.mask_bkg_weight = kwargs.pop('mask_bkg_weight', 1.0)
+         name = kwargs.pop('name', 'mse')
+         perceptual_name = kwargs.pop('perceptual_name', 'lpips')
+         self.tv_norm = tv_norm_funcs[kwargs.pop('tv_type', 'l2sq')]
+@@ -197,7 +203,7 @@ class DifferentiableBlocksWorld(nn.Module):
+ 
+     def forward(self, inp, labels):
+         rec = self.predict(inp, labels)
+-        return self.compute_losses(inp['imgs'], rec)
++        return self.compute_losses(inp['imgs'], rec, masks=inp.get('masks'))
+ 
+     def predict(self, inp, labels, w_edges=False, filter_transparent=False):
+         B, gt, R_tgt, T_tgt = len(inp['imgs']), inp['imgs'], inp['R'], inp['T']
+@@ -210,6 +216,7 @@ class DifferentiableBlocksWorld(nn.Module):
+         fine_learning = not self.is_live('coarse_learning')
+         filter_tsp = filter_transparent or fine_learning
+         renderer = self.renderer_fine if fine_learning else self.renderer
++        self._blocks_alpha = None
+         if self.decouple_rendering:
+             env = join_meshes_as_scene([self.build_bkg(world_coord=True), self.build_ground(world_coord=True)])
+             rec_env = self.renderer_env(env.extend(B), R=R_tgt, T=T_tgt).split([3, 1], dim=1)[0]
+@@ -219,8 +226,9 @@ class DifferentiableBlocksWorld(nn.Module):
+                 alpha = None if filter_tsp else self._alpha.repeat_interleave(self.BNF).repeat(B)
+                 rec_fg, mask = renderer(blocks.extend(B), R=R_tgt, T=T_tgt, faces_alpha=alpha).split([3, 1], dim=1)
+             else:
+-                rec_fg, mask = torch.zeros_like(rec_env), torch.zeros_like(rec_env)
++                rec_fg, mask = torch.zeros_like(rec_env), torch.zeros_like(rec_env)[:, :1]
+             rec = rec_fg * mask + (1 - mask) * rec_env
++            self._blocks_alpha = mask  # B1HW block coverage, used by the silhouette loss
+ 
+         else:
+             scene = self.build_scene(filter_transparent=filter_tsp)
+@@ -358,7 +366,7 @@ class DifferentiableBlocksWorld(nn.Module):
+         points = points @ R + T[:, None]
+         return points
+ 
+-    def compute_losses(self, imgs, rec):
++    def compute_losses(self, imgs, rec, masks=None):
+         losses = {k: torch.tensor(0.0, device=imgs.device) for k in self.loss_weights}
+ 
+         coarse_learning = self.is_live('coarse_learning')
+@@ -404,6 +412,14 @@ class DifferentiableBlocksWorld(nn.Module):
+             overlap_loss = (occupancy.sum(0) - OVERLAP_N_BLOCKS).clamp(0).mean()
+             losses['overlap'] = self.loss_weights['overlap'] * factor * overlap_loss
+ 
++        # Silhouette: block coverage should match the foreground mask (1 = gate, 0 = background, 0.5 = ignore)
++        if 'mask' in losses and masks is not None and getattr(self, '_blocks_alpha', None) is not None:
++            alpha = self._blocks_alpha
++            fg, bg = (masks > 0.75).float(), (masks < 0.25).float()
++            w = fg + self.mask_bkg_weight * bg
++            err = (alpha - fg) ** 2
++            losses['mask'] = self.loss_weights['mask'] * (w * err).sum() / w.sum().clamp(min=1)
++
+         losses['total'] = sum(losses.values())
+         return losses
+ 
