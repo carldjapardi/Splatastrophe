@@ -1,0 +1,367 @@
+{
+  "issue": 26,
+  "date": "2026-11-22",
+  "source": "https://www.cs.ubc.ca/~kmyi/imw2020/data.html",
+  "engine": "Spirula Studio v2026.11.12 built with CUDA 12.6",
+  "gpu": "NVIDIA L40 restored from the existing Brandenburg snapshot",
+  "compute": {
+    "hourly_usd": 0.79,
+    "approved_cap_usd": 2,
+    "estimated_upper_bound_usd": 0.24,
+    "estimate_basis": "At most 18 minutes from console creation to verified deletion, including restore time. Training and evaluation consumed only part of this window. Excludes existing snapshot storage.",
+    "temporary_instance_deleted": true,
+    "original_snapshot_ready_after_deletion": true
+  },
+  "training": {
+    "preset": "in-the-wild",
+    "train_resolution_divisor": 1,
+    "sampling_seed": 0,
+    "cap_max": 500000,
+    "masked": false
+  },
+  "evaluation": {
+    "split": "Project interleaved disjoint train, validation and test splits by filename. Validation views are excluded from training and test scoring.",
+    "camera_provenance": "Supplied COLMAP cameras and calibrated intrinsics. The upstream SfM reconstruction used all registered views.",
+    "held_out_mode": "filename",
+    "eval_align": false,
+    "eval_lpips": false,
+    "metrics": "Full-image PSNR and SSIM before spatial crop, opacity edits and SOG compression. Iteration count was selected using the run comparisons below, so the results are development measurements."
+  },
+  "browser_export": {
+    "converter": "PlayCanvas splat-transform 3.12.0",
+    "format": "SOG v3",
+    "sh_bands": 3,
+    "sh_iterations": 4,
+    "sh_palette_size": 8192,
+    "crop_bounds_order": "x_min, y_min, z_min, x_max, y_max, z_max passed to splat-transform --filter-box before SOG serialization.",
+    "refinement": "pipeline/reconstruction/refine_sog.py",
+    "validation": "Loaded the six photo reconstructions and procedural tower in the local playground. Visually checked default and oblique views, both new notes, and reset for the new scenes. Verified Impact, strike, and reset on the tower. No browser console errors during catalog switching."
+  },
+  "scenes": {
+    "reichstag": {
+      "scene_config": "configs/scenes/reichstag.json",
+      "source_archive": "reichstag.tar.gz",
+      "source_archive_sha256": "695b534b22dc800e09295a6809461dbc375fe1b9be9ded2f235036eca00fc50d",
+      "split_manifest_sha256": "c2f1160f70bcf79688f77b36155f6844fceece3d2d76d92df084d443eb231ef5",
+      "training_views": 60,
+      "validation_views": 7,
+      "baseline_500_steps_divisor_2": {
+        "avg_psnr": 14.7171,
+        "avg_ssim": 0.688642,
+        "num_eval_images": 7,
+        "training_time": 3.89708
+      },
+      "full_resolution_runs": {
+        "fullres": {
+          "avg_psnr": 16.0018,
+          "avg_ssim": 0.730918,
+          "num_eval_images": 7,
+          "training_time": 24.5594
+        }
+      },
+      "selected_run": "fullres",
+      "num_iterations": 3000,
+      "exported_ply_count": 160803,
+      "exported_ply_sha256": "515dafa6e5e4bba895454e005ef06bba97ef03cf45faca360654fa385382fa2b",
+      "scale": "Uncalibrated reconstruction units",
+      "browser": {
+        "asset": "web/public/models/reichstag.sog",
+        "crop_bounds": [
+          -5.15,
+          -1.8,
+          7.7,
+          5.15,
+          1.6,
+          12.65
+        ],
+        "opacity_profile": {
+          "rotate_x_180": false,
+          "support": {
+            "min_alpha": 0.075,
+            "max_sigma": 0.045,
+            "neighbors": 3
+          },
+          "suppress": [
+            {
+              "regions": [
+                [
+                  [
+                    -8,
+                    -4,
+                    5
+                  ],
+                  [
+                    8,
+                    4,
+                    18
+                  ]
+                ]
+              ],
+              "min_sigma": 0.06,
+              "max_alpha": 1.57,
+              "support_distance": [
+                0.033,
+                0.11
+              ],
+              "sigma_ramp": 0.075,
+              "max_reduction": 0.999
+            },
+            {
+              "regions": [
+                [
+                  [
+                    -6,
+                    -2,
+                    7
+                  ],
+                  [
+                    6,
+                    2,
+                    15
+                  ]
+                ]
+              ],
+              "min_sigma": 0.0125,
+              "max_alpha": 1.57,
+              "support_distance": [
+                0.012,
+                0.039
+              ],
+              "sigma_ramp": 0.017,
+              "max_reduction": 0.995,
+              "min_blue_excess": 0.014
+            },
+            {
+              "regions": [
+                [
+                  [
+                    -5.4,
+                    -1.7,
+                    7.5
+                  ],
+                  [
+                    -4.3,
+                    1.8,
+                    13.8
+                  ]
+                ],
+                [
+                  [
+                    4.3,
+                    -1.7,
+                    7.5
+                  ],
+                  [
+                    5.4,
+                    1.8,
+                    13.8
+                  ]
+                ]
+              ],
+              "min_sigma": 0.02,
+              "max_alpha": 1.57,
+              "support_distance": [
+                0.013,
+                0.044
+              ],
+              "sigma_ramp": 0.023,
+              "max_reduction": 0.999,
+              "min_blue_excess": 0.011
+            }
+          ],
+          "solidify": {
+            "regions": [
+              [
+                [
+                  -4.8,
+                  -1.75,
+                  8.1
+                ],
+                [
+                  4.8,
+                  1.4,
+                  12.3
+                ]
+              ]
+            ],
+            "max_sigma": 0.047,
+            "min_alpha": 0.075,
+            "max_alpha": 0.7,
+            "support_distance": [
+              0.009,
+              0.052
+            ],
+            "gain": 1.21
+          }
+        },
+        "opacity_report": {
+          "splat_count": 137138,
+          "alpha_reduced": 33428,
+          "alpha_increased": 33492,
+          "source_sha256": "fb675f92026ad14f05d450f34d06932e0f9ecb1a7ba059db1ced71fc9c92b683",
+          "output_sha256": "528a107c12dc712fc9e43e12e0ece6df5b596fc9176c7bd7253a94a2aed99bc2"
+        },
+        "bytes": 2322511,
+        "camera": {
+          "target": [
+            0,
+            9.9,
+            0
+          ],
+          "distance": 12.5,
+          "yaw": -1.5707963267948966,
+          "pitch": 0.06,
+          "rotationX": -90
+        },
+        "limitations": "Front facade, towers and visible dome. Residual roof-edge haze, fragmentary ground and limited side and rear coverage."
+      }
+    },
+    "nara-temple": {
+      "scene_config": "configs/scenes/nara-temple.json",
+      "source_archive": "temple_nara_japan.tar.gz",
+      "source_archive_sha256": "af10fec1ece4bd1086898447a71b79ddf2c47ff4c7b52758f06b98bf5f1af84a",
+      "split_manifest_sha256": "1851c1bd4120f23573c84982dc59a2e46efe1d2035c615db15d09022ca1d82e7",
+      "training_views": 724,
+      "validation_views": 90,
+      "baseline_500_steps_divisor_2": {
+        "avg_psnr": 14.0406,
+        "avg_ssim": 0.637119,
+        "num_eval_images": 90,
+        "training_time": 6.8339
+      },
+      "full_resolution_runs": {
+        "fullres-6000": {
+          "avg_psnr": 15.0134,
+          "avg_ssim": 0.692358,
+          "num_eval_images": 90,
+          "training_time": 70.9709
+        },
+        "fullres": {
+          "avg_psnr": 14.8419,
+          "avg_ssim": 0.685131,
+          "num_eval_images": 90,
+          "training_time": 31.7644
+        }
+      },
+      "selected_run": "fullres-6000",
+      "num_iterations": 6000,
+      "exported_ply_count": 499831,
+      "exported_ply_sha256": "17e19948940eb1dc5f51c14c0978cfbbb8075d08d7812c1fffdd6dafe9160333",
+      "scale": "Uncalibrated reconstruction units",
+      "browser": {
+        "asset": "web/public/models/nara-temple.sog",
+        "crop_bounds": [
+          -8,
+          -3.8,
+          10.65,
+          8,
+          3.85,
+          20.0
+        ],
+        "opacity_profile": {
+          "rotate_x_180": false,
+          "support": {
+            "min_alpha": 0.075,
+            "max_sigma": 0.045,
+            "neighbors": 3
+          },
+          "suppress": [
+            {
+              "regions": [
+                [
+                  [
+                    -8,
+                    -6,
+                    3
+                  ],
+                  [
+                    12,
+                    4,
+                    24
+                  ]
+                ]
+              ],
+              "min_sigma": 0.057,
+              "max_alpha": 1.57,
+              "support_distance": [
+                0.032,
+                0.11
+              ],
+              "sigma_ramp": 0.07,
+              "max_reduction": 0.999
+            },
+            {
+              "regions": [
+                [
+                  [
+                    -8.2,
+                    -4.1,
+                    10
+                  ],
+                  [
+                    8.2,
+                    4.1,
+                    21
+                  ]
+                ]
+              ],
+              "min_sigma": 0.0125,
+              "max_alpha": 1.57,
+              "support_distance": [
+                0.012,
+                0.039
+              ],
+              "sigma_ramp": 0.017,
+              "max_reduction": 0.999,
+              "min_blue_excess": 0.014
+            }
+          ],
+          "solidify": {
+            "regions": [
+              [
+                [
+                  -7.7,
+                  -3.6,
+                  11
+                ],
+                [
+                  7.7,
+                  3.7,
+                  19.7
+                ]
+              ]
+            ],
+            "max_sigma": 0.049,
+            "min_alpha": 0.068,
+            "max_alpha": 0.72,
+            "support_distance": [
+              0.009,
+              0.061
+            ],
+            "gain": 1.25
+          }
+        },
+        "opacity_report": {
+          "splat_count": 333554,
+          "alpha_reduced": 73136,
+          "alpha_increased": 89656,
+          "source_sha256": "b0ee6027067c0e5a7ceac0240c2394712413a88cc625b4d0db3a5a07b21affa2",
+          "output_sha256": "3242f861bc3f78cceb11f00cd5ad6df91794ea931b2cebd9513909f85890c5db"
+        },
+        "bytes": 5033452,
+        "camera": {
+          "target": [
+            1.8,
+            13,
+            -0.35
+          ],
+          "distance": 15,
+          "yaw": -1.5707963267948966,
+          "pitch": 0.08,
+          "rotationX": -90
+        },
+        "limitations": "Front Great Buddha Hall and both gold ornaments. Residual roof-edge haze, limited rear coverage and a deliberately shortened courtyard."
+      }
+    }
+  }
+}

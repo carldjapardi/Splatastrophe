@@ -47,7 +47,7 @@ describe('building catalog', () => {
     const entries = parseCatalog(catalog);
     expect(entries[0]).toMatchObject({ id: 'brandenburg-gate', fixture: 'static-sog', camera: { distance: .31 } });
     expect(entries.filter(value => value.fixture === 'static-sog').map(entry => entry.id)).toEqual([
-      'brandenburg-gate', 'trevi-fountain', 'westminster', 'taj-mahal',
+      'brandenburg-gate', 'trevi-fountain', 'westminster', 'taj-mahal', 'reichstag', 'nara-temple',
     ]);
     const landmark = catalog.buildings[0];
     for (const asset of ['https://example.com/trevi.sog', 'models/../trevi.sog', 'models/trevi.ply']) {
