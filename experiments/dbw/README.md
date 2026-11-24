@@ -11,6 +11,9 @@ This folder runs [Differentiable Blocks World](https://arxiv.org/abs/2307.05473)
 | `brandenburg.yml` | v1 training config. Copy it to `configs/phototourism/brandenburg.yml` |
 | `brandenburg_v2.yml` | v2 config: gate masks, tighter crop, weaker parsimony, blocks initialized over the gate |
 | `dbw_masks.patch` | Patch for DBW (upstream `fb08bd1`): silhouette loss on gate masks, plus `T_center` and `T_ground_y` init options |
+| `dbw_per_view_K.patch` | Patch for DBW, applied after `dbw_masks.patch`: renders every view with its own intrinsics K. Upstream keeps the first batch's K for all views |
+| `check_per_view_K.py` | CPU check that DBW's renderer places geometry correctly in a batch of views with different K |
+| `check_mask_fit.py` | CPU mask-only fit, upstream shared K vs per-view K, scored by block-to-mask IoU |
 | `2026-11-23-gate-v1.md` | v1 run record and failure analysis |
 | `2026-11-24-gate-v2.md` | v2 run record: masked run, also failed, plus the camera check |
 | `check_cameras.py` | Projects sparse gate points with each view's K and with DBW's single shared K, and scores both against the masks |
@@ -45,6 +48,7 @@ v2 trains on gate-centred crops and adds a silhouette loss: the blocks' rendered
 ```bash
 # in the DBW repo
 git apply <splatastrophe>/experiments/dbw/dbw_masks.patch
+git apply <splatastrophe>/experiments/dbw/dbw_per_view_K.patch
 cp <splatastrophe>/experiments/dbw/brandenburg_v2.yml configs/phototourism/
 
 # in Splatastrophe: 1) select views and stage them, 2) masks, 3) crops + masks + cameras
@@ -77,7 +81,7 @@ Local checks before any GPU run, in a clean upstream `fb08bd1` clone with the pa
 - Gradients reached `T`, `S`, `R_6d`, `alpha_logit` and `sq_eps`.
 - A mask-only fit, 60 steps on 6 pilot views on CPU, raised block-to-mask IoU from 0.29 to about 0.5. The blocks moved onto the gate but were still blob-shaped.
 
-**Result (November 24):** v2 also failed. Only one block stayed visible, a rounded blob over the middle of the gate. See [the run record](2026-11-24-gate-v2.md). Both runs trained with one shared set of camera intrinsics, because DBW reads K once from the first batch. Fix that before another run.
+**Result (November 24):** v2 also failed. Only one block stayed visible, a rounded blob over the middle of the gate. See [the run record](2026-11-24-gate-v2.md). Both runs trained with one shared set of camera intrinsics, because DBW reads K once from the first batch. `dbw_per_view_K.patch` fixes this. In a CPU mask-only fit it raised block-to-mask IoU from 0.35 to 0.70 ([details](2026-11-24-gate-v2.md#per-view-k-fix-november-24)).
 
 The crop and the ignore band use the mask's bounding box. The sparse "core" points used for normalization cover only the central columns (x from −0.62 to 0.6), while the full gate spans about x from −1.0 to 1.0.
 
@@ -93,7 +97,7 @@ To map splats into the block frame, first undo the reconstruction's own pose nor
 
 ## Environment notes
 
-- **Intrinsics:** DBW sets the camera K once, from the first training batch. PhotoTourism views each have their own K, so this dataset needs per-batch K or crops resampled to one shared K. See the [camera check](2026-11-24-gate-v2.md#camera-check-november-24-both-runs-used-the-wrong-intrinsics).
+- **Intrinsics:** DBW sets the camera K once, from the first training batch. PhotoTourism views each have their own K, so apply `dbw_per_view_K.patch`. See the [camera check](2026-11-24-gate-v2.md#camera-check-november-24-both-runs-used-the-wrong-intrinsics).
 
 - Without `MKL_THREADING_LAYER=GNU`, numpy matmuls deadlock in the DBW env.
 - `opencv-python` needs libGL. Use `opencv-python-headless==4.6.0.66`.
