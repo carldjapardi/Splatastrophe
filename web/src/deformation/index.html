@@ -19,7 +19,18 @@
         <p id="building-description" class="hint"></p>
         <div id="load-error" role="alert" hidden><p id="error-message"></p><button id="retry" type="button">Retry loading</button></div>
       </section>
-      <section id="landmark-controls" hidden><button id="landmark-reset" type="button">Reset view</button></section>
+      <section id="landmark-controls" hidden>
+        <div id="landmark-motion" hidden>
+          <div class="row" role="group" aria-label="Gate motion">
+            <button id="landmark-bounce" type="button">Bounce</button>
+            <button id="landmark-sway" type="button">Sway</button>
+          </div>
+          <p class="hint">Scripted motion with a contact shadow at the column bases.</p>
+          <button id="landmark-motion-reset" type="button">Reset motion</button>
+          <span id="landmark-motion-status" class="sr-only" role="status"></span>
+        </div>
+        <button id="landmark-reset" type="button">Reset view</button>
+      </section>
       <fieldset id="controls" disabled>
         <legend class="sr-only">Scene controls</legend>
         <section>

@@ -55,6 +55,15 @@ describe('building catalog', () => {
     }
   });
 
+  it('enables landmark motion only for a configured asset and validates its footprint', () => {
+    const entries = parseCatalog(catalog);
+    const landmarks = entries.filter(value => value.fixture === 'static-sog');
+    expect(landmarks.filter(value => value.motion).map(value => value.id)).toEqual(['brandenburg-gate']);
+    const gate = catalog.buildings[0];
+    const invalid = { ...gate, motion: { ...gate.motion, halfWidth: 0 } };
+    expect(() => parseCatalog({ schemaVersion: 1, buildings: [invalid] })).toThrow(/motion.halfWidth/);
+  });
+
   it('rejects unsupported fixtures, duplicate IDs and invalid synthetic settings', () => {
     const tower = catalog.buildings.find(value => value.fixture === 'synthetic-tower')!;
     expect(() => parseCatalog({ schemaVersion: 1, buildings: [{ ...tower, fixture: 'barn.ply' }] })).toThrow(/Unsupported fixture/);

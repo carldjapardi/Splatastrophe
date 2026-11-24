@@ -37,6 +37,14 @@ export interface LandmarkEntry extends BuildingIdentity {
   fixture: 'static-sog';
   asset: string;
   camera: OrbitCamera & { rotationX: number };
+  motion?: LandmarkMotionSpec;
+}
+
+export interface LandmarkMotionSpec {
+  base: Point;
+  halfWidth: number;
+  halfDepth: number;
+  bounceHeight: number;
 }
 
 export type CatalogEntry = BuildingEntry | LandmarkEntry;
@@ -62,11 +70,18 @@ export function parseCatalog(value: unknown): CatalogEntry[] {
         throw new Error(`Invalid local SOG path for ${id}`);
       }
       const camera = record(entry.camera, 'camera');
+      const motion = entry.motion === undefined ? undefined : record(entry.motion, 'motion');
       return {
         ...identity, fixture: entry.fixture, asset,
         camera: {
           ...parseCamera(camera, [-1.4, 1.4], [.05, 100]),
           rotationX: bounded(camera.rotationX, 'camera.rotationX', -360, 360),
+        },
+        motion: motion && {
+          base: point(motion.base, 'motion.base'),
+          halfWidth: bounded(motion.halfWidth, 'motion.halfWidth', .001, 30),
+          halfDepth: bounded(motion.halfDepth, 'motion.halfDepth', .001, 30),
+          bounceHeight: bounded(motion.bounceHeight, 'motion.bounceHeight', .001, 30),
         },
       };
     }
