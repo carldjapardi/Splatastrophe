@@ -1,4 +1,4 @@
-import { BLEND_NORMAL, CULLFACE_NONE, Entity, StandardMaterial, Texture } from 'playcanvas';
+import { BLEND_NORMAL, BoundingBox, CULLFACE_NONE, Entity, Mat4, StandardMaterial, Texture } from 'playcanvas';
 import type { Application } from 'playcanvas';
 import type { LandmarkMotionSpec } from './catalog';
 
@@ -26,6 +26,18 @@ export function sampleLandmarkMotion(action: Motion, elapsed: number, spec: Land
   const angle = -0.11 * Math.sin(2 * Math.PI * elapsed / .95) * envelope;
   // Rotate about the base center and lift it just enough to keep the lower edge grounded.
   return { lift: spec.halfWidth * Math.abs(Math.sin(angle)), angle };
+}
+
+export function inferLandmarkMotion(assetBounds: BoundingBox, rotationX: number): LandmarkMotionSpec {
+  const world = new BoundingBox();
+  world.setFromTransformedAabb(assetBounds, new Mat4().setFromEulerAngles(rotationX, 0, 0));
+  const { center, halfExtents } = world;
+  return {
+    base: [center.x, center.y, center.z - halfExtents.z],
+    halfWidth: Math.max(halfExtents.x, .001),
+    halfDepth: Math.max(halfExtents.y, .001),
+    bounceHeight: Math.max(.3 * halfExtents.z, .001),
+  };
 }
 
 export function mountLandmarkMotion(app: Application, landmark: Entity, spec: LandmarkMotionSpec, options: AddEventListenerOptions) {
@@ -66,11 +78,6 @@ export function mountLandmarkMotion(app: Application, landmark: Entity, spec: La
   shadow.addComponent('render', { type: 'plane', material, castShadows: false, receiveShadows: false });
   app.root.addChild(shadow);
 
-  const bounce = document.querySelector<HTMLButtonElement>('#landmark-bounce')!;
-  const sway = document.querySelector<HTMLButtonElement>('#landmark-sway')!;
-  const status = document.querySelector('#landmark-motion-status')!;
-  let action: Motion | undefined;
-  let elapsed = 0;
   function place(lift: number, angle: number) {
     rig.setLocalPosition(x, y, z + lift);
     rig.setLocalEulerAngles(0, angle * 180 / Math.PI, 0);
@@ -79,12 +86,32 @@ export function mountLandmarkMotion(app: Application, landmark: Entity, spec: La
     shadow.setLocalScale(2.6 * spec.halfWidth * spread, 1, 4 * spec.halfDepth * spread);
     material.opacity = 1 - .65 * separation;
   }
+  const motion = bindBuildingMotion(app, spec, place, options);
+  return () => {
+    motion.dispose();
+    shadow.destroy();
+    material.destroy();
+    texture.destroy();
+  };
+}
+
+export function bindBuildingMotion(
+  app: Application,
+  spec: LandmarkMotionSpec,
+  place: (lift: number, angle: number) => void,
+  options: AddEventListenerOptions,
+) {
+  const bounce = document.querySelector<HTMLButtonElement>('#landmark-bounce')!;
+  const sway = document.querySelector<HTMLButtonElement>('#landmark-sway')!;
+  const status = document.querySelector('#landmark-motion-status')!;
+  let action: Motion | undefined;
+  let elapsed = 0;
   function reset() {
     action = undefined;
     bounce.removeAttribute('aria-disabled');
     sway.removeAttribute('aria-disabled');
     place(0, 0);
-    status.textContent = 'Gate at rest.';
+    status.textContent = 'Building at rest.';
   }
   function play(next: Motion) {
     if (action) return;
@@ -107,10 +134,5 @@ export function mountLandmarkMotion(app: Application, landmark: Entity, spec: La
   });
   reset();
 
-  return () => {
-    update.off();
-    shadow.destroy();
-    material.destroy();
-    texture.destroy();
-  };
+  return { reset, dispose: () => update.off() };
 }

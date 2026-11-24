@@ -1,6 +1,6 @@
 import { Application, Asset, Color, Entity, FILLMODE_NONE, RESOLUTION_AUTO, Vec3 } from 'playcanvas';
 import type { LandmarkEntry } from './catalog';
-import { mountLandmarkMotion } from './landmarkMotion';
+import { inferLandmarkMotion, mountLandmarkMotion } from './landmarkMotion';
 
 export async function mountLandmark(entry: LandmarkEntry, signal: AbortSignal) {
   const canvas = document.querySelector<HTMLCanvasElement>('#view')!;
@@ -66,8 +66,10 @@ export async function mountLandmark(entry: LandmarkEntry, signal: AbortSignal) {
     landmark.setLocalEulerAngles(preset.rotationX, 0, 0);
     landmark.addComponent('gsplat', { asset });
     const options = { signal: controls.signal };
-    if (entry.motion) disposeMotion = mountLandmarkMotion(app, landmark, entry.motion, options);
-    else app.root.addChild(landmark);
+    const resource = asset.resource;
+    if (!resource) throw new Error(`${entry.name} loaded without a Gaussian splat resource`);
+    const motion = entry.motion ?? inferLandmarkMotion(resource.aabb, preset.rotationX);
+    disposeMotion = mountLandmarkMotion(app, landmark, motion, options);
     let pointer: { id: number; x: number; y: number } | undefined;
     canvas.addEventListener('pointerdown', (event) => {
       if (pointer || event.button !== 0) return;
@@ -97,7 +99,7 @@ export async function mountLandmark(entry: LandmarkEntry, signal: AbortSignal) {
     reset();
     app.start();
     document.body.dataset.ready = '1';
-    return { dispose, motion: Boolean(entry.motion) };
+    return { dispose };
   } catch (error) {
     dispose();
     throw error;
