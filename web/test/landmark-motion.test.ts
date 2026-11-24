@@ -1,10 +1,22 @@
+import { BoundingBox, Vec3 } from 'playcanvas';
 import { describe, expect, it } from 'vitest';
 import type { LandmarkMotionSpec } from '../src/playground/catalog';
-import { sampleLandmarkMotion } from '../src/playground/landmarkMotion';
+import { inferLandmarkMotion, sampleLandmarkMotion } from '../src/playground/landmarkMotion';
 
 const spec: LandmarkMotionSpec = { base: [0, 0, 0], halfWidth: .09, halfDepth: .02, bounceHeight: .036 };
 
 describe('landmark motion', () => {
+  it('uses the rotated footprint and base for landmarks without a configured pivot', () => {
+    const source = new BoundingBox(new Vec3(1, -4, 8), new Vec3(2, 3, 5));
+    const motion = inferLandmarkMotion(source, -90);
+    expect(motion.base[0]).toBeCloseTo(1);
+    expect(motion.base[1]).toBeCloseTo(8);
+    expect(motion.base[2]).toBeCloseTo(1);
+    expect(motion.halfWidth).toBeCloseTo(2);
+    expect(motion.halfDepth).toBeCloseTo(5);
+    expect(motion.bounceHeight).toBeCloseTo(.9);
+  });
+
   it('bounces above ground with a smaller rebound and settles', () => {
     expect(sampleLandmarkMotion('bounce', 0, spec)).toEqual({ lift: 0, angle: 0 });
     const apex = sampleLandmarkMotion('bounce', .36, spec)!;

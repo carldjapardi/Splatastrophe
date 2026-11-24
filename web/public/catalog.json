@@ -43,6 +43,12 @@
         "yaw": -1.5707963267948966,
         "pitch": 0.06,
         "rotationX": -90
+      },
+      "motion": {
+        "base": [0.04, 7.87, -3.15],
+        "halfWidth": 7.05,
+        "halfDepth": 3.3,
+        "bounceHeight": 1.02
       }
     },
     {
@@ -62,6 +68,12 @@
         "yaw": -1.72,
         "pitch": 0.1,
         "rotationX": -90
+      },
+      "motion": {
+        "base": [-0.56, 6.07, -1.49],
+        "halfWidth": 3.63,
+        "halfDepth": 4.52,
+        "bounceHeight": 0.31
       }
     },
     {
@@ -81,6 +93,12 @@
         "yaw": -1.5707963267948966,
         "pitch": 0.1,
         "rotationX": -90
+      },
+      "motion": {
+        "base": [0.21, 10.39, -0.91],
+        "halfWidth": 2.4,
+        "halfDepth": 1.95,
+        "bounceHeight": 0.32
       }
     },
     {
@@ -100,6 +118,12 @@
         "yaw": -1.5707963267948966,
         "pitch": 0.06,
         "rotationX": -90
+      },
+      "motion": {
+        "base": [0.04, 9.22, -1.49],
+        "halfWidth": 4.54,
+        "halfDepth": 1.18,
+        "bounceHeight": 0.42
       }
     },
     {
@@ -119,6 +143,12 @@
         "yaw": -1.5707963267948966,
         "pitch": 0.08,
         "rotationX": -90
+      },
+      "motion": {
+        "base": [1.32, 14, -3.01],
+        "halfWidth": 6.45,
+        "halfDepth": 3.48,
+        "bounceHeight": 0.86
       }
     },
     {

@@ -55,10 +55,10 @@ describe('building catalog', () => {
     }
   });
 
-  it('enables landmark motion only for a configured asset and validates its footprint', () => {
+  it('loads motion footprints for all catalog landmarks and validates each footprint', () => {
     const entries = parseCatalog(catalog);
     const landmarks = entries.filter(value => value.fixture === 'static-sog');
-    expect(landmarks.filter(value => value.motion).map(value => value.id)).toEqual(['brandenburg-gate']);
+    expect(landmarks.every(value => value.motion?.bounceHeight && value.motion.bounceHeight > 0)).toBe(true);
     const gate = catalog.buildings[0];
     const invalid = { ...gate, motion: { ...gate.motion, halfWidth: 0 } };
     expect(() => parseCatalog({ schemaVersion: 1, buildings: [invalid] })).toThrow(/motion.halfWidth/);
