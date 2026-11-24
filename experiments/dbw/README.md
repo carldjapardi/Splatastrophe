@@ -12,7 +12,8 @@ This folder runs [Differentiable Blocks World](https://arxiv.org/abs/2307.05473)
 | `brandenburg_v2.yml` | v2 config: gate masks, tighter crop, weaker parsimony, blocks initialized over the gate |
 | `dbw_masks.patch` | Patch for DBW (upstream `fb08bd1`): silhouette loss on gate masks, plus `T_center` and `T_ground_y` init options |
 | `2026-11-23-gate-v1.md` | v1 run record and failure analysis |
-| `2026-11-24-gate-v2.md` | v2 run record: masked run, also failed |
+| `2026-11-24-gate-v2.md` | v2 run record: masked run, also failed, plus the camera check |
+| `check_cameras.py` | Projects sparse gate points with each view's K and with DBW's single shared K, and scores both against the masks |
 
 ## Setup
 
@@ -76,7 +77,7 @@ Local checks before any GPU run, in a clean upstream `fb08bd1` clone with the pa
 - Gradients reached `T`, `S`, `R_6d`, `alpha_logit` and `sq_eps`.
 - A mask-only fit, 60 steps on 6 pilot views on CPU, raised block-to-mask IoU from 0.29 to about 0.5. The blocks moved onto the gate but were still blob-shaped.
 
-**Result (November 24):** v2 also failed. Only one block stayed visible, a rounded blob over the middle of the gate. See [the run record](2026-11-24-gate-v2.md).
+**Result (November 24):** v2 also failed. Only one block stayed visible, a rounded blob over the middle of the gate. See [the run record](2026-11-24-gate-v2.md). Both runs trained with one shared set of camera intrinsics, because DBW reads K once from the first batch. Fix that before another run.
 
 The crop and the ignore band use the mask's bounding box. The sparse "core" points used for normalization cover only the central columns (x from −0.62 to 0.6), while the full gate spans about x from −1.0 to 1.0.
 
@@ -91,6 +92,8 @@ x_dbw = s * A @ (x_colmap - c)
 To map splats into the block frame, first undo the reconstruction's own pose normalization (Nerfstudio `dataparser_transforms.json`, or the transform recorded for the Spirula export) to get back to COLMAP coordinates, then apply this transform.
 
 ## Environment notes
+
+- **Intrinsics:** DBW sets the camera K once, from the first training batch. PhotoTourism views each have their own K, so this dataset needs per-batch K or crops resampled to one shared K. See the [camera check](2026-11-24-gate-v2.md#camera-check-november-24-both-runs-used-the-wrong-intrinsics).
 
 - Without `MKL_THREADING_LAYER=GNU`, numpy matmuls deadlock in the DBW env.
 - `opencv-python` needs libGL. Use `opencv-python-headless==4.6.0.66`.
