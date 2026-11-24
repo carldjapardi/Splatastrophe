@@ -12,6 +12,7 @@ This folder runs [Differentiable Blocks World](https://arxiv.org/abs/2307.05473)
 | `brandenburg_v2.yml` | v2 config: gate masks, tighter crop, weaker parsimony, blocks initialized over the gate |
 | `dbw_masks.patch` | Patch for DBW (upstream `fb08bd1`): silhouette loss on gate masks, plus `T_center` and `T_ground_y` init options |
 | `2026-11-23-gate-v1.md` | v1 run record and failure analysis |
+| `2026-11-24-gate-v2.md` | v2 run record: masked run, also failed |
 
 ## Setup
 
@@ -74,6 +75,8 @@ Local checks before any GPU run, in a clean upstream `fb08bd1` clone with the pa
 - The trainer ran through the coarse-to-fine switch with `loss_mask` logged.
 - Gradients reached `T`, `S`, `R_6d`, `alpha_logit` and `sq_eps`.
 - A mask-only fit, 60 steps on 6 pilot views on CPU, raised block-to-mask IoU from 0.29 to about 0.5. The blocks moved onto the gate but were still blob-shaped.
+
+**Result (November 24):** v2 also failed. Only one block stayed visible, a rounded blob over the middle of the gate. See [the run record](2026-11-24-gate-v2.md).
 
 The crop and the ignore band use the mask's bounding box. The sparse "core" points used for normalization cover only the central columns (x from −0.62 to 0.6), while the full gate spans about x from −1.0 to 1.0.
 
