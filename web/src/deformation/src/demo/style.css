@@ -47,3 +47,4 @@ footer { padding-top: 6px; }
 @media (max-width: 480px) { .workspace { display: flex; flex-direction: column-reverse; height: auto; } #stage { height: 55dvh; min-height: 300px; } #panel { overflow: visible; border-right: 0; } .viewport-note { left: 12px; right: 12px; } }
 
 body[data-building="landmark"] :is(#tower-details, #tower-note) { display: none; }
+body[data-building="tower"] :is(#landmark-earthquake, #landmark-earthquake-hint, #landmark-motion-status) { display: none; }
