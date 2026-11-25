@@ -1,6 +1,7 @@
 """Mask-only DBW fit on CPU, old (one shared K) vs new (per-view K). Same seed, views, init and steps.
 Run from the DBW repo root with both patches applied:
-    python <splatastrophe>/experiments/dbw/check_mask_fit.py {old,new} STEPS OUT.npz [THREADS]
+    python <splatastrophe>/experiments/dbw/check_mask_fit.py {old,new} STEPS OUT.npz [THREADS] [CONFIG]
+CONFIG defaults to phototourism/brandenburg_v2.yml; its dataset tag is used.
 Only the mask, parsimony and overlap losses are used (no rgb), starting in the coarse phase. Batch 2."""
 import sys, time, copy, numpy as np, torch
 sys.path.insert(0, 'src')
@@ -11,8 +12,8 @@ from optimizer import create_optimizer
 from dataset.phototourism import PhototourismDataset
 mode, steps, out = sys.argv[1], int(sys.argv[2]), sys.argv[3]
 torch.manual_seed(0); np.random.seed(0); torch.set_num_threads(int(sys.argv[4]) if len(sys.argv) > 4 else 4)
-cfg = load_yaml(CONFIGS_PATH / 'phototourism/brandenburg_v2.yml')
-ds = PhototourismDataset('train', tag='brandenburg_v2', on_disk=False)
+cfg = load_yaml(CONFIGS_PATH / (sys.argv[5] if len(sys.argv) > 5 else 'phototourism/brandenburg_v2.yml'))
+ds = PhototourismDataset('train', tag=cfg['dataset']['tag'], on_disk=False)
 model = create_model(copy.deepcopy(cfg), ds.img_size)
 model.loss_weights = {k: v for k, v in model.loss_weights.items() if k in ('mask', 'parsimony', 'overlap')}
 opt = create_optimizer(cfg, model)

@@ -14,6 +14,11 @@ This folder runs [Differentiable Blocks World](https://arxiv.org/abs/2307.05473)
 | `dbw_per_view_K.patch` | Patch for DBW, applied after `dbw_masks.patch`: renders every view with its own intrinsics K. Upstream keeps the first batch's K for all views |
 | `check_per_view_K.py` | CPU check that DBW's renderer places geometry correctly in a batch of views with different K |
 | `check_mask_fit.py` | CPU mask-only fit, upstream shared K vs per-view K, scored by block-to-mask IoU |
+| `register_loader.patch` | Registers `phototourism` in DBW's dataset list (setup step 2 as a patch) |
+| `synthetic_faults.py` | Renders the `/faults/` block building as a synthetic DBW dataset with known parts |
+| `synthetic_faults.yml` | Config for the synthetic control, same model and losses as v2 |
+| `run_dbw.sh` | Sets up DBW on a fresh GPU instance and trains one or more runs in sequence |
+| `part-decomposition-research.md` | Survey for task 2: how to break a building into physical parts, and how DBW could run on splats and models |
 | `2026-11-23-gate-v1.md` | v1 run record and failure analysis |
 | `2026-11-24-gate-v2.md` | v2 run record: masked run, also failed, plus the camera check |
 | `check_cameras.py` | Projects sparse gate points with each view's K and with DBW's single shared K, and scores both against the masks |
@@ -84,6 +89,36 @@ Local checks before any GPU run, in a clean upstream `fb08bd1` clone with the pa
 **Result (November 24):** v2 also failed. Only one block stayed visible, a rounded blob over the middle of the gate. See [the run record](2026-11-24-gate-v2.md). Both runs trained with one shared set of camera intrinsics, because DBW reads K once from the first batch. `dbw_per_view_K.patch` fixes this. In a CPU mask-only fit it raised block-to-mask IoU from 0.35 to 0.70 ([details](2026-11-24-gate-v2.md#per-view-k-fix-november-24)).
 
 The crop and the ignore band use the mask's bounding box. The sparse "core" points used for normalization cover only the central columns (x from −0.62 to 0.6), while the full gate spans about x from −1.0 to 1.0.
+
+## Synthetic control
+
+The gate runs mix several unknowns: lighting, crowds, the small target, viewpoints mostly from the front, and (until the per-view K patch) camera intrinsics. As a control, `synthetic_faults.py` renders the block building from the [fault-point collapse page](https://splatastrophe.vercel.app/faults/), `web/public/faults/collapse.js`. It's a gate-like arch of 52 boxes: base, two walls, centre pier, lintel, attic, cornice and top. The 200 views have exact cameras, one fixed light and a full 360° orbit, with focal length varying about 2×.
+
+- The script exports `parts.json`, the true boxes in DBW's frame, so DBW's blocks can be scored against real parts.
+- In DBW's own camera code, 99% of surface points project inside each view's mask (`check_cameras.py`).
+
+If DBW can't split this building into its walls, lintel and top, it won't on the real gate.
+
+```bash
+python experiments/dbw/synthetic_faults.py --out <dbw-repo>/datasets/phototourism/synthetic_faults --views 200
+cp experiments/dbw/synthetic_faults.yml <dbw-repo>/configs/phototourism/
+python src/trainer.py --tag synth_v1 --config phototourism/synthetic_faults.yml   # in the DBW repo, on a GPU
+```
+
+## Running on GCP
+
+Both runs fit on one T4 instance: `n1-standard-8` with `nvidia-tesla-t4`, image family `common-cu129-ubuntu-2204-nvidia-580` from `deeplearning-platform-release`. The driver is preinstalled, and DBW's conda env brings its own CUDA 11.3.
+
+- Don't use an L4. Its newer architecture is likely unsupported by DBW's PyTorch 1.12 / CUDA 11.3 builds.
+- New projects need the global `GPUS_ALL_REGIONS` quota raised from 0 to 1.
+
+```bash
+# copy run_dbw.sh, the three patches, phototourism.py, both configs and both dataset tarballs to ~/dbw_run, then
+setsid nohup bash ~/dbw_run/run_dbw.sh synth_v1:synthetic_faults.yml:synthetic_faults.tar.gz \
+  gate_v2k:brandenburg_v2.yml:brandenburg_v2.tar.gz > ~/dbw_run.log 2>&1 &
+```
+
+Delete the instance as soon as the results are copied off.
 
 ## Coordinate frame
 

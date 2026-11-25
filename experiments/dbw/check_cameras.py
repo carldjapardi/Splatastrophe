@@ -37,7 +37,7 @@ print('per-view K : in-frame %.2f  in-mask %.2f (median over views)' % tuple(np.
 print('shared K   : in-frame %.2f  in-mask %.2f (median over views)' % tuple(np.median(r[:, 2:], 0)))
 print('views with in-mask < 0.5: per-view %d, shared %d of %d' % ((r[:, 1] < .5).sum(), (r[:, 3] < .5).sum(), N))
 # figure
-sel = list(np.argsort(r[:, 3])[[5, 30, 60]]) + list(np.argsort(r[:, 3])[[120, 180, 250]])
+sel = list(np.argsort(r[:, 3])[(np.array([0.02, 0.11, 0.22, 0.45, 0.67, 0.93]) * (N - 1)).astype(int)])
 tiles = []
 for i in sel:
     im = Image.open(D / 'images' / names[i]).convert('RGB'); dr = ImageDraw.Draw(im)

@@ -1,0 +1,59 @@
+# Synthetic control: the fault-point collapse building rendered by synthetic_faults.py (exact cameras, one light,
+# no crowds, known parts). Same model and losses as brandenburg_v2.yml; needs dbw_masks.patch and
+# dbw_per_view_K.patch. 200 views at batch 4 = 50 iters/epoch; milestones keep ~25.5k iterations like v1/v2.
+dataset:
+  name: phototourism
+  tag: synthetic_faults
+model:
+  name: dbw
+  mesh:
+    n_blocks: 12
+    S_world: 1
+    R_world: [0, 0, 0]
+    T_world: [0, 0, 0]
+    txt_size: 256
+    # gate spans roughly x [-1.0, 1.0], y [-0.9, 0.55], z [-0.45, 0.23] in the prep frame (sparse "core" points
+    # cover only x [-0.62, 0.6]; the width comes from the masks)
+    T_init_mode: uni
+    T_range: [0.9, 0.7, 0.3]
+    T_center: [0, -0.2, -0.1]
+    T_ground_y: -0.9
+  renderer:
+    faces_per_pixel: 10
+    cameras:
+      name: perspective
+    detach_bary: True
+    z_clip: 0.001
+  rend_optim:
+    coarse_learning: 400   # 200 views = 50 iters/epoch; same ~20k coarse iterations as v2
+    decimate_txt: 200
+    decimate_factor: 8
+    kill_blocks: True
+    decouple_rendering: True
+    opacity_noise: True
+  loss:
+    rgb_weight: 1
+    perceptual_weight: 0.1
+    parsimony_weight: 0.002
+    tv_weight: 0.1
+    overlap_weight: 1
+    mask_weight: 1
+    mask_bkg_weight: 0.5
+training:
+  batch_size: 4
+  n_workers: 4
+  optimizer:
+    name: adam
+    lr: 5.0e-3
+    texture:
+      lr: 5.0e-2
+  scheduler:
+    name: multi_step
+    gamma: [0.1, 0.1]
+    milestones: [480]
+  n_epoches: 510
+  train_stat_interval: 50
+  val_stat_interval: 100
+  seed: 222213
+  visualizer_port:
+  resume:
