@@ -99,6 +99,13 @@ The gate runs mix several unknowns: lighting, crowds, the small target, viewpoin
 
 If DBW can't split this building into its walls, lintel and top, it won't on the real gate.
 
+**CPU mask-only fit (November 24):**
+- *Setup:* `check_mask_fit.py` with per-view K, 150 steps at batch 2, on 24 views spread across focal lengths.
+- *Result:* block-to-mask IoU went from 0.43 to **0.87** (median 0.86, minimum 0.78).
+- *What it shows:* the synthetic pipeline works end to end, from rendering through cameras to DBW's loader and renderer. It says nothing yet about parts, since that needs the full GPU run with rgb losses and the fine phase.
+
+![orange: block coverage after 150 steps; blue: building mask](2026-11-24-synthetic-mask-fit.jpg)
+
 ```bash
 python experiments/dbw/synthetic_faults.py --out <dbw-repo>/datasets/phototourism/synthetic_faults --views 200
 cp experiments/dbw/synthetic_faults.yml <dbw-repo>/configs/phototourism/

@@ -87,7 +87,7 @@ The three routes can share one evaluation: on the synthetic building we know eve
   - A full GPU rerun is waiting on GCP GPU quota.
 - **Synthetic building, DBW from rendered views (route A on a mesh):**
   - The dataset is built and checked: 200 views, 52 known boxes, 99% of points inside the masks.
-  - A CPU mask fit is running.
+  - A CPU mask-only fit reached block-to-mask IoU 0.87, up from 0.43 (gate: 0.70).
   - The full GPU run is queued with the gate rerun in `run_dbw.sh`.
 - **Not started:** route B (3D loss), route C (EMS or Marching-Primitives), rendering the gate splat for route A, and splat-to-block assignment.
 
