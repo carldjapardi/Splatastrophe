@@ -18,6 +18,8 @@ This folder runs [Differentiable Blocks World](https://arxiv.org/abs/2307.05473)
 | `synthetic_faults.py` | Renders the `/faults/` block building as a synthetic DBW dataset with known parts |
 | `synthetic_faults.yml` | Config for the synthetic control, same model and losses as v2 |
 | `run_dbw.sh` | Sets up DBW on a fresh GPU instance and trains one or more runs in sequence |
+| `task2-spec.md` | Full task 2 spec for a coding agent: problem, existing assets, phases, constraints, acceptance |
+| `faults_geometry.py` | NumPy-only geometry of the `/faults/` test building (52 boxes, part labels) |
 | `part-decomposition-research.md` | Survey for task 2: how to break a building into physical parts, and how DBW could run on splats and models |
 | `2026-11-23-gate-v1.md` | v1 run record and failure analysis |
 | `2026-11-24-gate-v2.md` | v2 run record: masked run, also failed, plus the camera check |
