@@ -25,6 +25,8 @@ export interface BreakingPhysics {
 const STEP = 1 / 120;
 const TOUCH_TOLERANCE = 1e-5;
 const DENSITY = 2200;
+const UNLOAD_MIN_STEPS = 30;
+const TOPPLE_STRENGTH = 0.4;
 const IDENTITY = { x: 0, y: 0, z: 0, w: 1 };
 let rapierReady: Promise<void> | undefined;
 
@@ -63,6 +65,10 @@ export async function createBreakingPhysics(
   });
 
   const attachments: { a: number; b: number }[] = [];
+  // supportersOf[i]: parts whose top face carries part i, or -1 for the ground.
+  const supportersOf: number[][] = original.map(() => []);
+  const restsOn = (upper: BreakingPart, lower: BreakingPart) =>
+    Math.abs(upper.center[2] - upper.halfSize[2] - lower.center[2] - lower.halfSize[2]) <= TOUCH_TOLERANCE;
   for (let a = 0; a < original.length; a++) {
     const first = original[a];
     if (Math.abs(first.center[2] - first.halfSize[2] - groundZ) <= TOUCH_TOLERANCE) {
@@ -76,9 +82,14 @@ export async function createBreakingPhysics(
         return [0, 1, 2].every(other => other === axis ||
           Math.min(first.center[other] + first.halfSize[other], second.center[other] + second.halfSize[other]) >
           Math.max(first.center[other] - first.halfSize[other], second.center[other] - second.halfSize[other]));
-      })) attachments.push({ a, b });
+      })) {
+        attachments.push({ a, b });
+        if (restsOn(first, second)) supportersOf[a].push(b);
+        if (restsOn(second, first)) supportersOf[b].push(a);
+      }
     }
   }
+  attachments.forEach(({ a, b }) => { if (b < 0) supportersOf[a].push(-1); });
 
   await (rapierReady ??= RAPIER.init().catch(error => {
     rapierReady = undefined;
@@ -87,6 +98,9 @@ export async function createBreakingPhysics(
   let world: RAPIER.World;
   let bodies: RAPIER.RigidBody[];
   let joints: { a: number; b: number; joint: RAPIER.ImpulseJoint }[];
+  let colliders: RAPIER.Collider[];
+  // A broken support stops carrying the parts it held: solver contact between them is off until they separate.
+  let unloaded: { support: number; part: number; steps: number }[] = [];
   let accumulator = 0;
   let stepped = false;
   let disposed = false;
@@ -108,6 +122,8 @@ export async function createBreakingPhysics(
       body.recomputeMassPropertiesFromColliders();
       return body;
     });
+    colliders = bodies.map(body => body.collider(0));
+    unloaded = [];
     joints = attachments.map(({ a, b }) => {
       const first = original[a].center;
       const second = b < 0 ? [0, 0, groundZ] : original[b].center;
@@ -119,6 +135,18 @@ export async function createBreakingPhysics(
       joint.setContactsEnabled(false);
       return { a, b, joint };
     });
+  }
+
+  // Solver groups: (membership << 16) | filter. A carried part's membership is the support's bit, and the support's
+  // filter drops that bit, so the pair still collides with everything else but not with each other.
+  function applySolverGroups() {
+    colliders.forEach(collider => collider.setSolverGroups(0xffffffff));
+    for (const { support, part } of unloaded) {
+      const bit = 1 << (support % 16);
+      const own = colliders[support].solverGroups();
+      colliders[support].setSolverGroups(own & ~bit);
+      colliders[part].setSolverGroups((bit << 16) | 0xffff);
+    }
   }
 
   function assertActive() {
@@ -141,20 +169,56 @@ export async function createBreakingPhysics(
       if (!Number.isInteger(index) || index < 0 || index >= bodies.length) throw new Error('Part index is out of range');
       if (!Number.isFinite(strength)) throw new Error('Strength must be finite');
       const amount = Math.min(1, Math.max(0, strength));
-      joints = joints.filter(record => {
-        if (record.a !== index && record.b !== index) return true;
-        world.removeImpulseJoint(record.joint, true);
-        return false;
-      });
-      broken.add(index);
+      const release = (part: number) => {
+        joints = joints.filter(record => {
+          if (record.a !== part && record.b !== part) return true;
+          world.removeImpulseJoint(record.joint, true);
+          return false;
+        });
+        broken.add(part);
+      };
+      release(index);
+      const carried = new Set<number>();
+      // A part that rested only on released parts has lost its support. Its remaining side joints are mortar that
+      // would have to carry it as a cantilever, so release it too and let gravity take it (repeat up the stack).
+      for (let changed = true; changed;) {
+        changed = false;
+        original.forEach((_, part) => {
+          if (broken.has(part) || supportersOf[part].length === 0) return;
+          if (supportersOf[part].every(below => below >= 0 && broken.has(below))) {
+            release(part);
+            if (supportersOf[part].includes(index)) carried.add(part);
+            changed = true;
+          }
+        });
+      }
       const body = bodies[index];
       const impulse = body.mass() * 3 * amount;
       const [hx, hy, hz] = original[index].halfSize.map(v => v * scale);
+      // A push strong enough to topple a tall part counts as that part failing: it stops carrying the parts it held,
+      // so they drop instead of riding it over. Weaker pushes leave it carrying them.
+      if (hx < hy && hz > hx && amount >= TOPPLE_STRENGTH) {
+        for (const part of carried) unloaded.push({ support: index, part, steps: 0 });
+        applySolverGroups();
+      }
       if (hx < hy) {
         const middleX = original.reduce((sum, part) => sum + part.center[0], 0) / original.length;
         const direction = original[index].center[0] < middleX ? -1 : 1;
-        body.applyImpulse({ x: direction * body.mass() * 2 * Math.sqrt(2 * 9.81 * 2 * hx) * amount, y: 0, z: 0 }, true);
-        body.applyTorqueImpulse({ x: 0, y: direction * body.mass() * (hx * hx + hz * hz) / 3 * 0.12 * amount, z: 0 }, true);
+        if (hz > hx) {
+          // Tall part: push its top so it tips about its front base edge, toward the default camera (-y). It no longer
+          // carries what it held up, so in-plane neighbours can't wedge it. The push is sized from the energy needed to
+          // lift the centre of mass over that edge, (R - h/2)·m·g with R = ½√(d² + h²) and pivot inertia m(d² + h²)/3,
+          // times 0.7 + strength for any push: about 0.4 and up topples it (1.2× at the default 0.5), weaker pushes rock
+          // it back, and 0 only releases it.
+          const d = 2 * hy, h = 2 * hz;
+          const pivotInertia = (d * d + h * h) / 3;
+          const tipRate = Math.sqrt(2 * 9.81 * (Math.hypot(d, h) / 2 - h / 2) / pivotInertia);
+          const top = body.translation();
+          body.applyImpulseAtPoint({ x: 0, y: -body.mass() * pivotInertia * tipRate * (amount > 0 ? 0.7 + amount : 0) / h, z: 0 },
+            { x: top.x, y: top.y, z: top.z + hz }, true);
+        } else {
+          body.applyImpulse({ x: direction * body.mass() * 2 * Math.sqrt(2 * 9.81 * 2 * hx) * amount, y: 0, z: 0 }, true);
+        }
       } else {
         body.applyImpulse({ x: 0, y: -impulse, z: 0 }, true);
         body.applyTorqueImpulse({ x: body.mass() * (hy * hy + hz * hz) / 3 * 1.2 * amount, y: 0, z: 0 }, true);
@@ -175,6 +239,19 @@ export async function createBreakingPhysics(
       while (accumulator + 1e-12 >= STEP) {
         world.step();
         stepped = true;
+        if (unloaded.length) {
+          const before = unloaded.length;
+          unloaded = unloaded.filter(pair => {
+            pair.steps++;
+            if (pair.steps < UNLOAD_MIN_STEPS) return true;
+            let touching = false;
+            world.contactPair(colliders[pair.support], colliders[pair.part], manifold => {
+              if (manifold.numContacts() > 0) touching = true;
+            });
+            return touching;
+          });
+          if (unloaded.length !== before) applySolverGroups();
+        }
         accumulator = Math.max(0, accumulator - STEP);
       }
     },

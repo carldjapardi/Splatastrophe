@@ -57,7 +57,8 @@ describe('Z-up breaking physics', () => {
     expect(Math.abs(poses[0].rotation[0])).toBeGreaterThan(0.01);
     expect(poses[1].position[2]).toBeLessThan(1);
     expect(poses[2].position[2]).toBeLessThan(2.4);
-    expect(controller.getBrokenCount()).toBe(1);
+    // The upper block rested only on the support, so it is released with it.
+    expect(controller.getBrokenCount()).toBe(2);
   });
 
   it('collapses every part, preserves ground collisions, and counts unique parts', async () => {
@@ -218,21 +219,36 @@ describe('Z-up breaking physics', () => {
     expect(() => controller.reset()).toThrow(/disposed/);
   });
 
-  it('moves actual gate columns along their thin axis without forcing supported roofs to fall', async () => {
-    for (const [index, direction] of [[0, -1], [5, 1]]) {
+  it('topples a broken gate column toward the camera and drops the roof bay it carried', async () => {
+    const meters = (pose: { position: number[] }, index: number) =>
+      pose.position.map((v, axis) => (v - gateParts[index].center[axis]) * gateSpec.metersPerUnit);
+    const tilt = (q: number[]) => 2 * Math.acos(Math.min(1, Math.abs(q[3]))) * 180 / Math.PI;
+    // Outer column, a middle column under the sculpture, and the other outer column.
+    for (const index of [0, 2, 5]) {
+      const roof = 6 + index;
       const controller = await create(gateParts, gateSpec);
       controller.breakPart(index, 0.5);
-      advance(controller, 0.5);
-      const moved = controller.getPoses();
-      expect(direction * (moved[index].position[0] - gateParts[index].center[0]) * gateSpec.metersPerUnit).toBeGreaterThan(0.5);
-      expect(moved[index].position[1]).toBeCloseTo(gateParts[index].center[1], 5);
-      expect(moved[6].position[2]).toBeCloseTo(gateParts[6].center[2], 4);
-      expect(controller.getBrokenCount()).toBe(1);
-      controller.reset();
-      controller.breakPart(index, 1);
-      advance(controller, 0.5);
-      expect(direction * (controller.getPoses()[index].position[0] - gateParts[index].center[0]) * gateSpec.metersPerUnit).toBeGreaterThan(2);
+      expect(controller.getBrokenCount()).toBe(2);
+      advance(controller, 5);
+      const poses = controller.getPoses();
+      expect(tilt(poses[index].rotation)).toBeGreaterThan(80);
+      expect(meters(poses[index], index)[1]).toBeLessThan(-5);
+      expect(meters(poses[roof], roof)[2]).toBeLessThan(-10);
+      poses.forEach((pose, other) => {
+        if (other !== index && other !== roof) expect(Math.hypot(...meters(pose, other))).toBeLessThan(0.05);
+      });
     }
+  });
+
+  it('leaves a weakly pushed gate column carrying its released roof bay', async () => {
+    const controller = await create(gateParts, gateSpec);
+    controller.breakPart(2, 0.2);
+    advance(controller, 3);
+    expect(controller.getBrokenCount()).toBe(2);
+    controller.getPoses().forEach((pose, index) => {
+      expect(Math.hypot(...pose.position.map((v, axis) => (v - gateParts[index].center[axis]) * gateSpec.metersPerUnit)))
+        .toBeLessThan(0.05);
+    });
   });
 
   it('keeps gravity-supported actual gate parts stable after releasing every joint', async () => {

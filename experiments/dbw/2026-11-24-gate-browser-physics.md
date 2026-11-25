@@ -10,6 +10,13 @@ Select Brandenburg Gate and enable breaking physics. Choose a part and push stre
 
 Six column groups, six roof sections and one sculpture group follow 13 Rapier rigid bodies. Closed cuboids give mass and inertia; face-touching proxies receive fixed joints, and columns receive ground anchors. Breaking explicitly removes incident joints and applies a mass-scaled impulse; it does **not** infer material failure from stress. Whole-gate breaking removes every joint and pushes each part. Merely removing joints may leave a stable stack; a single released column can remain wedged under a roof held by other columns.
 
+**Single-part breaks (follow-up, November 24).** In the first version a broken column slid about 0.8 m and stopped: the roof section above it was still jointed to its neighbours, the flush proxies jammed it, and the push was about a quarter of what tipping needs. Now:
+- A break also releases every part whose only supports were released (repeated up the stack), so a column takes its roof section with it.
+- A column pushed at 40% or more counts as failing. It stops carrying the parts it held: their solver contacts with it are off until the pair stops touching (Rapier solver groups). Its top gets an impulse sized from the energy to lift its centre of mass over its front base edge, times 0.7 + strength, so it tips toward the default camera (−y). Out of plane is used because in-plane tipping is blocked by the neighbouring bays.
+- Below 40% the released column and roof stay standing as a stable stack.
+- `npm run check`: 45 tests pass. Every column at 50% tips past 80° and moves more than 5 m toward the camera, its roof bay drops more than 10 m, and every other part moves less than 5 cm within 5 simulated seconds.
+- Limit: the dropped bay can come to rest overlapping the fallen column's front edge by about 1 m, because their contact stays off while they touch.
+
 All 1,893,636 original Gaussians remain present, in the same SOG texel-index order. Membership uses rest positions and never changes as parts move. The work-buffer shader rotates Gaussian centers and orientations, not just their bounding boxes. CPU sorting centers receive the identical rigid transforms. Updates wait for a completed sort and rendered frame before submitting another center version, avoiding an asynchronous-sort backlog that otherwise freezes the visible pose until pause. Multisampling is disabled for landmark splats. All other renderer controls and the source SOG are unchanged.
 
 ## Geometry and units
