@@ -24,6 +24,9 @@ button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-v
 .row button { flex: 1; }
 .row { margin-bottom: 14px; }
 #controls { border: 0; padding: 0; margin: 0; min-width: 0; }
+#gate-breaking { margin-top: 20px; }
+#gate-breaking fieldset { border: 0; padding: 0; margin: 16px 0 0; min-width: 0; }
+#gate-part { width: 100%; margin-bottom: 16px; }
 #load-status { font-size: 11px; color: #667262; margin: 10px 0; }
 #load-status[data-state=error], #load-error { color: #93483e; }
 #load-error { padding: 10px; background: #fff0e9; border-radius: 4px; }
