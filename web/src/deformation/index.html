@@ -19,7 +19,26 @@
         <p id="building-description" class="hint"></p>
         <div id="load-error" role="alert" hidden><p id="error-message"></p><button id="retry" type="button">Retry loading</button></div>
       </section>
-      <section id="landmark-controls" hidden><button id="landmark-reset" type="button">Reset view</button></section>
+      <section id="landmark-controls" hidden>
+        <button id="landmark-reset" type="button">Reset view</button>
+        <div id="gate-breaking" hidden>
+          <p class="eyebrow">Breakable gate · experimental</p>
+          <p class="hint">Move the real splats as 13 rigid parts. Coarse hand-fitted boxes supply volume; connections release on command, not from calculated stone stress.</p>
+          <button type="button" data-enable>Enable breaking physics</button>
+          <fieldset hidden disabled>
+            <legend class="sr-only">Gate breaking controls</legend>
+            <label for="gate-part">Part to release</label>
+            <select id="gate-part"></select>
+            <label for="gate-strength">Push strength <output for="gate-strength">50%</output></label>
+            <input id="gate-strength" data-strength type="range" min="0" max="1" step="0.05" value="0.5" />
+            <div class="row"><button type="button" data-break>Break selected part</button><button type="button" data-collapse>Break whole gate</button></div>
+            <div class="row"><button type="button" data-pause>Resume</button><button type="button" data-reset-building>Reset building</button></div>
+            <label class="check"><input type="checkbox" data-proxies /> Show solid proxies</label>
+          </fieldset>
+          <p role="status" class="hint">13 coarse parts · physics not started</p>
+          <p class="hint">Breaking releases joints and pushes the chosen parts. Other supports can still hold the roof. Rapier gravity and collisions use illustrative scale and material values, not an engineering prediction. Pauses after 15 simulated seconds; Resume continues.</p>
+        </div>
+      </section>
       <fieldset id="controls" disabled>
         <legend class="sr-only">Scene controls</legend>
         <section>

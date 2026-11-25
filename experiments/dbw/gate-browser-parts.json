@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "source": "web/public/models/brandenburg-spirula.sog",
+  "frame": "viewer: x right, z up, rotationX 180 from source SOG",
+  "method": "Hand-fitted coarse box proxies from front and side projections; not validated architectural segmentation",
+  "metersPerUnit": 160,
+  "scaleNote": "Illustrative scale only, not surveyed or calibrated",
+  "groundZ": -0.09,
+  "columnTop": -0.014,
+  "roofTop": 0.029,
+  "columnX": [-0.049, -0.016, 0.017, 0.058, 0.091, 0.126],
+  "columnHalfWidth": 0.0075,
+  "columnDepth": [0.322, 0.382],
+  "roofEdges": [-0.068, -0.0325, 0.0005, 0.0375, 0.0745, 0.1085, 0.143],
+  "roofDepth": [0.314, 0.390],
+  "sculptureBounds": [[0.005, 0.323, 0.029], [0.065, 0.387, 0.079]],
+  "assignmentBounds": [[-0.069, 0.291, -0.100], [0.144, 0.407, 0.080]]
+}

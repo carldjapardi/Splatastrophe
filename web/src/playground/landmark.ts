@@ -1,15 +1,18 @@
 import { Application, Asset, Color, Entity, FILLMODE_NONE, RESOLUTION_AUTO, Vec3 } from 'playcanvas';
 import type { LandmarkEntry } from './catalog';
+import { attachGateBreaking } from './gateBreaking';
 
 export async function mountLandmark(entry: LandmarkEntry, signal: AbortSignal) {
   const canvas = document.querySelector<HTMLCanvasElement>('#view')!;
   const stage = canvas.parentElement!;
   const controls = new AbortController();
-  const app = new Application(canvas);
+  const app = new Application(canvas, { graphicsDeviceOptions: { antialias: false } });
   let objectUrl: string | undefined;
   let observer: ResizeObserver | undefined;
+  let disposeBreaking: (() => void) | undefined;
   const dispose = () => {
     controls.abort();
+    disposeBreaking?.();
     observer?.disconnect();
     app.destroy();
     canvas.style.removeProperty('width');
@@ -63,6 +66,10 @@ export async function mountLandmark(entry: LandmarkEntry, signal: AbortSignal) {
     landmark.setLocalEulerAngles(preset.rotationX, 0, 0);
     landmark.addComponent('gsplat', { asset });
     app.root.addChild(landmark);
+    if (entry.id === 'brandenburg-gate') disposeBreaking = attachGateBreaking(app, landmark, () => {
+      distance = Math.max(distance, baseDistance * 1.7);
+      place();
+    });
 
     const options = { signal: controls.signal };
     let pointer: { id: number; x: number; y: number } | undefined;
