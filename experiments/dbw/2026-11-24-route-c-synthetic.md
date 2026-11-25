@@ -60,7 +60,7 @@ The 52 true boxes, exported with eps=.1, give mean part IoU **0.976673**, volume
 2. The authored lintel intersects earlier wall/pier boxes. With exclusive true voxel labels, even the exact sharp lintel union has IoU **0.885361**, not one: 11,997 of its voxels already belong to earlier parts. Rounded lintel IoU is **0.880648**. Reporting one would require changing the specified geometry or label convention.
 3. Of 437 point-assignment errors, 423 occur inside a different true part. The surface generator labels by the generating block, whereas minimum F chooses a containing solid; those policies disagree at interpenetrating surfaces.
 
-The self-test reports exact-box and rounded-box per-part vectors. It requires mean/volume/assignment scores ≥.95 and each rounded per-part IoU within .035 of its exact-box-overlap baseline; the maximum measured difference is .020129. Ground truth was not relabeled to pass. Tests also cover anisotropic exponents, rotated solids, outside-volume penalties, malformed input, shell occlusion, empty fits, permutation-invariant geometry scores, deterministic fitting, thickness assumptions and known ellipsoid recovery by the actual EMS library. **21 tests pass.**
+The self-test reports exact-box and rounded-box per-part vectors. It requires mean/volume/assignment scores ≥.95 and each rounded per-part IoU within .035 of its exact-box-overlap baseline; the maximum measured difference is .020129. Ground truth was not relabeled to pass. Tests also cover anisotropic exponents, rotated solids, outside-volume penalties, malformed input, shell occlusion, empty fits, permutation-invariant geometry scores, deterministic fitting, thickness assumptions and known ellipsoid recovery by the actual EMS library. Including the matrix-backend regression described below, **22 tests pass.**
 
 ## Automatic gate application
 
@@ -76,7 +76,22 @@ Only after fitting and assignment, the previous hand-fitted browser grouping was
 
 ## Environment, artifacts and next decision
 
-Measured on the existing Ubuntu 24.04 machine: four AMD EPYC virtual CPUs, 16 GB RAM, Linux 6.1.158+, Python 3.12.3. Packages: NumPy 2.2.6, SciPy 1.15.3, Numba 0.61.2, llvmlite 0.44.0, scikit-learn 1.6.1, threadpoolctl 3.6.0, plyfile 1.1.3, Matplotlib 3.11.2, Pillow 13.0.0, pytest 8.4.2. Synthetic comparison including evaluation and figures took **44.685 s**. These are CPU timings, but **not laptop timings**: Beepbeep disconnected at 22:00:28 PST before the laptop run. No additional cloud machine, GPU job or paid service was started.
+The original table was measured on the existing Ubuntu 24.04 machine: four AMD EPYC virtual CPUs, 16 GB RAM, Linux 6.1.158+, Python 3.12.3. Initial packages: NumPy 2.2.6, SciPy 1.15.3, Numba 0.61.2, llvmlite 0.44.0, scikit-learn 1.6.1, threadpoolctl 3.6.0, plyfile 1.1.3, Matplotlib 3.11.2, Pillow 13.0.0, pytest 8.4.2. Synthetic comparison including evaluation and figures took **44.685 s**. The portable dependency update and actual laptop timings are below. No additional cloud machine, GPU job or paid service was started.
+
+### Apple M4 portability check
+
+The first laptop run failed: NumPy 2.2.6 reported divide-by-zero, overflow and invalid-operation warnings for `eye(15) @ eye(15)` even though the result was exactly the identity. Those spurious floating-point flags caused the strict EMS wrapper to reject its first fit. This matches the upstream [SME/FPSR backend defect and fix](https://github.com/numpy/numpy/pull/29223), not evidence that the bounded point cloud overflowed.
+
+The requirements now pin **NumPy 2.3.3 and Numba 0.62.1** (llvmlite 0.45.1), keeping the other package versions above. The identity check passes with all floating-point exceptions enabled; no warnings were suppressed. Both fitters then completed on Beepbeep: Apple M4 MacBook Air, 10 CPU cores, 24 GB RAM, macOS 26.5.1 arm64, Python 3.12.4, one BLAS/OpenMP/Numba thread. Installation is excluded from these subprocess wall times; import overhead is included.
+
+| Method | Input | Parts | Laptop fit wall seconds |
+|---|---|---:|---:|
+| K-means/PCA boxes | Full | 32 | 3.637 |
+| Hierarchical EMS | Full | 10 | 15.302 |
+| K-means/PCA boxes | Shell | 32 | 1.218 |
+| Hierarchical EMS | Shell | 9 | 2.113 |
+
+The first EMS run includes cold JIT compilation. All four are below the 15-minute laptop budget. Linux tests and the full comparison/gate export were rerun with these portable pins: 22 tests pass, all synthetic headline scores and gate reference scores are unchanged, and the comparison took 44.444 seconds. Laptop fits were rescored on the same held-out points and voxel grid: input hashes match exactly, PCA scores are identical, and the largest EMS headline-score difference is below 1.4e-7. New-pin artifacts are in `outputs/route-c-portable/` and `outputs/route-c-gate-portable/`; laptop timing evidence, input hashes and scores are in `outputs/route-c-portable/laptop-timings.json` and `laptop-scores.json`.
 
 Generated point sets, fits, scores, provenance and figures stay in ignored `outputs/route-c-comparison/` and `outputs/route-c-gate/`. Only this record, code, dependency pins, license notice and small referenced figures are committed. The supplementary archive contains the score/self-test JSON, all synthetic fits and the full-order gate membership/primitives/metadata.
 

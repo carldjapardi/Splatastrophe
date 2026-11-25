@@ -6,6 +6,12 @@ from fit_primitives_3d import fit_primitives
 from prepare_ems import DEFAULT_CHECKOUT
 
 
+def test_matrix_backend_does_not_raise_spurious_floating_point_errors():
+    with np.errstate(all="raise"):
+        identity = np.eye(15)
+        assert np.array_equal(identity @ identity, identity)
+
+
 def test_pca_is_deterministic_and_preserves_frame():
     rng = np.random.default_rng(38)
     rotation = Rotation.from_euler("xyz", [.2, -.4, .7]).as_matrix()
