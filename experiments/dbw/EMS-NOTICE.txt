@@ -1,0 +1,30 @@
+The EMS adapter and hierarchy in fit_primitives_3d.py follow the official
+Python implementation, especially Python/tests/multiquadric_test.py, at:
+https://github.com/bmlklwx/EMS-superquadric_fitting
+Commit: 5a213d46e8b013b5a153f5aa914b0925ee517af7
+
+Robust and Accurate Superquadric Recovery: a Probabilistic Approach
+Weixiao Liu, Yuwei Wu, Sipu Ruan, Gregory S. Chirikjian. CVPR 2022.
+DOI: 10.1109/CVPR52688.2022.00270
+
+MIT License
+
+Copyright (c) 2022 Weixiao Liu
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
