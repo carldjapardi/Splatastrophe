@@ -1,6 +1,7 @@
 import { Application, Asset, Color, Entity, FILLMODE_NONE, RESOLUTION_AUTO, Vec3 } from 'playcanvas';
 import type { LandmarkEntry } from './catalog';
 import { inferLandmarkMotion, mountLandmarkMotion } from './landmarkMotion';
+import { createLandmarkEarthquake } from './landmarkEarthquake';
 
 export async function mountLandmark(entry: LandmarkEntry, signal: AbortSignal) {
   const canvas = document.querySelector<HTMLCanvasElement>('#view')!;
@@ -69,7 +70,8 @@ export async function mountLandmark(entry: LandmarkEntry, signal: AbortSignal) {
     const resource = asset.resource;
     if (!resource) throw new Error(`${entry.name} loaded without a Gaussian splat resource`);
     const motion = entry.motion ?? inferLandmarkMotion(resource.aabb, preset.rotationX);
-    disposeMotion = mountLandmarkMotion(app, landmark, motion, options);
+    const earthquake = createLandmarkEarthquake(landmark.gsplat!, resource.aabb, preset.rotationX, motion);
+    disposeMotion = mountLandmarkMotion(app, landmark, motion, options, earthquake);
     let pointer: { id: number; x: number; y: number } | undefined;
     canvas.addEventListener('pointerdown', (event) => {
       if (pointer || event.button !== 0) return;

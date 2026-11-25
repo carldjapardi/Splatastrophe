@@ -1,8 +1,12 @@
 import { BLEND_NORMAL, BoundingBox, CULLFACE_NONE, Entity, Mat4, StandardMaterial, Texture } from 'playcanvas';
 import type { Application } from 'playcanvas';
 import type { LandmarkMotionSpec } from './catalog';
+import { earthquakeDuration, earthquakeStatus } from './landmarkEarthquake';
+import type { createLandmarkEarthquake } from './landmarkEarthquake';
 
 type Motion = 'bounce' | 'sway';
+type LandmarkAction = Motion | 'earthquake';
+type Earthquake = ReturnType<typeof createLandmarkEarthquake>;
 
 const bounceArcs = [.72, .31, .13];
 const swayDuration = 2.2;
@@ -40,7 +44,13 @@ export function inferLandmarkMotion(assetBounds: BoundingBox, rotationX: number)
   };
 }
 
-export function mountLandmarkMotion(app: Application, landmark: Entity, spec: LandmarkMotionSpec, options: AddEventListenerOptions) {
+export function mountLandmarkMotion(
+  app: Application,
+  landmark: Entity,
+  spec: LandmarkMotionSpec,
+  options: AddEventListenerOptions,
+  earthquake: Earthquake,
+) {
   const [x, y, z] = spec.base;
   const rig = new Entity('Landmark motion');
   rig.setLocalPosition(x, y, z);
@@ -86,7 +96,7 @@ export function mountLandmarkMotion(app: Application, landmark: Entity, spec: La
     shadow.setLocalScale(2.6 * spec.halfWidth * spread, 1, 4 * spec.halfDepth * spread);
     material.opacity = 1 - .65 * separation;
   }
-  const motion = bindBuildingMotion(app, spec, place, options);
+  const motion = bindBuildingMotion(app, spec, place, options, earthquake);
   return () => {
     motion.dispose();
     shadow.destroy();
@@ -100,34 +110,50 @@ export function bindBuildingMotion(
   spec: LandmarkMotionSpec,
   place: (lift: number, angle: number) => void,
   options: AddEventListenerOptions,
+  earthquake: Earthquake,
 ) {
   const bounce = document.querySelector<HTMLButtonElement>('#landmark-bounce')!;
   const sway = document.querySelector<HTMLButtonElement>('#landmark-sway')!;
+  const quake = document.querySelector<HTMLButtonElement>('#landmark-earthquake')!;
+  const buttons = { bounce, sway, earthquake: quake };
   const status = document.querySelector('#landmark-motion-status')!;
-  let action: Motion | undefined;
+  let action: LandmarkAction | undefined;
   let elapsed = 0;
-  function reset() {
+  function finish() {
     action = undefined;
-    bounce.removeAttribute('aria-disabled');
-    sway.removeAttribute('aria-disabled');
+    for (const button of Object.values(buttons)) button.removeAttribute('aria-disabled');
+  }
+  function reset() {
+    finish();
+    earthquake.reset();
     place(0, 0);
     status.textContent = 'Building at rest.';
   }
-  function play(next: Motion) {
+  function play(next: LandmarkAction) {
     if (action) return;
+    // A completed earthquake stays in view until replay, reset, or another action.
+    reset();
     action = next;
     elapsed = 0;
-    bounce.setAttribute('aria-disabled', 'true');
-    sway.setAttribute('aria-disabled', 'true');
-    status.textContent = next === 'bounce' ? 'Bouncing…' : 'Swaying…';
+    for (const button of Object.values(buttons)) button.setAttribute('aria-disabled', 'true');
+    if (next === 'earthquake') earthquake.start();
+    status.textContent = next === 'earthquake' ? earthquakeStatus(0) : next === 'bounce' ? 'Bouncing…' : 'Swaying…';
   }
 
-  bounce.addEventListener('click', () => play('bounce'), options);
-  sway.addEventListener('click', () => play('sway'), options);
+  for (const [name, button] of Object.entries(buttons)) {
+    button.addEventListener('click', () => play(name as LandmarkAction), options);
+  }
   document.querySelector('#landmark-motion-reset')!.addEventListener('click', reset, options);
   const update = app.on('update', (delta: number) => {
     if (!action) return;
     elapsed += delta;
+    if (action === 'earthquake') {
+      earthquake.update(elapsed);
+      const phase = earthquakeStatus(elapsed);
+      if (status.textContent !== phase) status.textContent = phase;
+      if (elapsed >= earthquakeDuration) finish();
+      return;
+    }
     const pose = sampleLandmarkMotion(action, elapsed, spec);
     if (pose) place(pose.lift, pose.angle);
     else reset();
