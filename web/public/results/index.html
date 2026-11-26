@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Splatastrophe’s landmark reconstruction results, matched views, and Astra benchmark protocol.">
+  <title>Results · Splatastrophe</title>
+  <link rel="stylesheet" href="results.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="shell" aria-label="Site">
+      <a class="brand" href="../">Splatastrophe</a>
+      <div class="nav-links">
+        <a href="../">Playground</a>
+        <a href="./" aria-current="page">Results</a>
+      </div>
+    </nav>
+  </header>
+  <main class="shell">
+    <section class="hero" aria-labelledby="title">
+      <div class="hero-copy">
+        <p class="eyebrow">Reconstruction results</p>
+        <h1 id="title">Brandenburg Gate</h1>
+        <p class="lead">We trained Gaussian splats from photos taken at different angles. Masking out the sky and plaza revealed the gate’s silhouette, column openings, and rooftop sculpture.</p>
+        <p class="gallery-link"><a href="#astra-benchmark">Astra benchmark</a> · <a href="#gallery-title">See all ten camera angles</a> · <a href="#reichstag">Reichstag pilot</a></p>
+        <dl class="facts">
+          <div><dt>Training photos</dt><dd>96</dd></div>
+          <div><dt>Training steps</dt><dd>12,000</dd></div>
+          <div><dt>Exported splats</dt><dd>1.98 million</dd></div>
+        </dl>
+      </div>
+      <figure class="hero-image">
+        <a href="assets/roof-detail.webp"><img src="assets/roof-detail.webp" alt="Low-angle render of Brandenburg Gate with the rooftop sculpture and stone relief against a dark background"></a>
+        <figcaption>Full-resolution Spirula Studio render from a held-out camera.</figcaption>
+      </figure>
+    </section>
+    <section class="study" id="astra-benchmark" aria-labelledby="astra-title">
+      <h2 id="astra-title">Can Astra reconstruct a landmark on its own?</h2>
+      <p>We plan to give Codex with GPT‑6.2 Astra a folder of landmark photos and a fixed GPU budget. Astra will choose and run its own tools for camera alignment, splat reconstruction, and export. We’ll compare its export with one produced by our finalized reconstruction pipeline. The end-to-end benchmark is pending.</p>
+      <div class="comparison benchmark-arms">
+        <div>
+          <h3>Our finalized pipeline</h3>
+          <p>Freeze the team’s camera, training, cleanup, and export settings before running the comparison.</p>
+        </div>
+        <div>
+          <h3>Astra’s autonomous run</h3>
+          <p>Give Astra the same photos and export requirements. Record its tool choices, retries, and any human intervention.</p>
+        </div>
+      </div>
+      <p>Both runs use the same training photos, GPU type and budget, and export requirements. We’ll render both at the same resolution from held-out viewpoints, score PSNR and SSIM, and inspect a full orbit for gaps, floating splats, and softened details. We’ll also report runtime, GPU spend, and the exported file size.</p>
+      <p>For the rear-view test, we’ll withhold a rear sector from a capture that has real photos all the way around. Both runs get the same reduced photo set. We’ll compare any synthesized surfaces with the reserved rear photos.</p>
+      <h3>Taj Mahal camera-pose pilot</h3>
+      <p>This earlier test changed only the training camera poses. Both Spirula runs used 32 training photos, 1,200 steps, and the same 21 held-out views. The VGGT-1B run used feed-forward poses without bundle adjustment.</p>
+      <table class="scores">
+        <caption>Mean scores on held-out photos</caption>
+        <thead><tr><th scope="col">Training camera poses</th><th scope="col">PSNR</th><th scope="col">SSIM</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">COLMAP</th><td>11.56 dB</td><td>0.517</td></tr>
+          <tr><th scope="row">VGGT-1B</th><td>10.01 dB</td><td>0.458</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section class="study" aria-labelledby="detail-title">
+      <h2 id="detail-title">Sharper detail at full resolution</h2>
+      <p>From the same held-out angle, the longer, full-resolution run shows cleaner column edges and more defined stonework. Early haze around the roof and openings recedes. The finest lettering is still soft.</p>
+      <div class="comparison">
+        <figure>
+          <a href="assets/early-front.webp"><img src="assets/early-front.webp" loading="lazy" alt="Early masked gate render with soft column edges and diffuse haze"></a>
+          <figcaption>500-step pilot · Half-resolution inputs</figcaption>
+        </figure>
+        <figure>
+          <a href="assets/landmark-front.webp"><img src="assets/landmark-front.webp" loading="lazy" alt="Longer masked gate render with sharper columns and darker, clearer openings"></a>
+          <figcaption>12,000-step run · Full-resolution inputs</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="study" aria-labelledby="base-title">
+      <h2 id="base-title">A little pavement under the columns</h2>
+      <p>Adding a narrow strip retained more of the contact area beneath the gate. The base is still patchy, and a bright stray patch remains near the center.</p>
+      <div class="comparison">
+        <figure>
+          <a href="assets/landmark-front.webp"><img src="assets/landmark-front.webp" loading="lazy" alt="Full-resolution gate with pavement excluded from the masks"></a>
+          <figcaption>Landmark mask</figcaption>
+        </figure>
+        <figure>
+          <a href="assets/pavement-front.webp"><img src="assets/pavement-front.webp" loading="lazy" alt="Full-resolution gate with slightly fuller column bases and a small bright patch near the pavement"></a>
+          <figcaption>Landmark mask with a narrow pavement strip</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="study" id="ghosting" aria-labelledby="ghosting-title">
+      <h2 id="ghosting-title">Ghosting at an oblique angle</h2>
+      <p>We removed splats outside a 3D volume around the gate. The large detached clouds beside and above it disappear from this angle. Some haze remains close to the columns and base.</p>
+      <div class="comparison">
+        <figure><a href="assets/ghosting-before.webp"><img src="assets/ghosting-before.webp" loading="lazy" alt="Oblique viewer screenshot with detached splat clouds around the gate"></a><figcaption>Original Spirula export</figcaption></figure>
+        <figure><a href="assets/ghosting-after.webp"><img src="assets/ghosting-after.webp" loading="lazy" alt="Matching oblique view after removing detached splats outside the gate volume"></a><figcaption>Trimmed Spirula export</figcaption></figure>
+      </div>
+      <p>The 96-photo pilot has 82 cameras in a front-facing 45° sector and 14 in the adjacent sector. The full 774-photo split also covers only the front and two front-oblique sectors. This helps explain why the shape becomes less solid as the camera rotates away from the front.</p>
+    </section>
+    <section class="study" id="issues" aria-labelledby="issues-title">
+      <h2 id="issues-title">Issues and fixes tried</h2>
+      <ul>
+        <li><strong>Sky and plaza clutter</strong> — foreground masks and Spirula’s cutout loss cleared most of the background.</li>
+        <li><strong>Soft stone detail</strong> — full-resolution training sharpened the relief and columns, though the finest markings remain soft.</li>
+        <li><strong>Detached ghosting</strong> — a 3D crop removed large floating clouds and kept 95.8% of the splats.</li>
+        <li><strong>Floating column bases</strong> — a narrow pavement mask filled in some of the base, which remains patchy.</li>
+        <li><strong>Thin side views</strong> — extending selected front splats in depth preserved the stone color but made little visible difference.</li>
+        <li><strong>Browser blur</strong> — using the viewport’s actual pixel resolution restored fine detail.</li>
+      </ul>
+    </section>
+    <section class="study gallery" aria-labelledby="gallery-title">
+      <h2 id="gallery-title">All ten held-out views</h2>
+      <p>Each row shows renders from the same camera. Open any image to see it at its saved resolution.</p>
+      <section class="angle-group">
+        <h3>Facade and base</h3>
+        <article class="angle">
+          <h4>Frontal view</h4>
+          <p>The front view shows cleaner openings and a little more stone at the bases. The bright spot near the middle is still visible.</p>
+          <div class="render-grid">
+            <figure>
+              <a href="assets/pilot-01.webp"><img src="assets/pilot-01.webp" width="506" height="336" loading="lazy" alt="Frontal view of Brandenburg Gate, 500-step masked pilot"></a>
+              <figcaption>500-step masked pilot</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/full-01.webp"><img src="assets/full-01.webp" width="1013" height="673" loading="lazy" alt="Frontal view of Brandenburg Gate, 12,000-step masked run"></a>
+              <figcaption>12,000-step masked run</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/base-01.webp"><img src="assets/base-01.webp" width="1013" height="673" loading="lazy" alt="Frontal view of Brandenburg Gate, 12,000-step run with pavement"></a>
+              <figcaption>12,000-step run with pavement</figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="angle">
+          <h4>Near-frontal view</h4>
+          <p>The stepped roof and depth between columns are clearer in the full-resolution renders.</p>
+          <div class="render-grid">
+            <figure>
+              <a href="assets/pilot-07.webp"><img src="assets/pilot-07.webp" width="512" height="342" loading="lazy" alt="Near-frontal view of Brandenburg Gate, 500-step masked pilot"></a>
+              <figcaption>500-step masked pilot</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/full-07.webp"><img src="assets/full-07.webp" width="1025" height="685" loading="lazy" alt="Near-frontal view of Brandenburg Gate, 12,000-step masked run"></a>
+              <figcaption>12,000-step masked run</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/base-07.webp"><img src="assets/base-07.webp" width="1025" height="685" loading="lazy" alt="Near-frontal view of Brandenburg Gate, 12,000-step run with pavement"></a>
+              <figcaption>12,000-step run with pavement</figcaption>
+            </figure>
+          </div>
+        </article>
+      </section>
+      <section class="angle-group">
+        <h3>Roof and sculpture</h3>
+        <article class="angle">
+          <h4>Low frontal view</h4>
+          <p>The sculpture’s outline and stone relief are clearer in the longer runs.</p>
+          <div class="render-grid">
+            <figure>
+              <a href="assets/pilot-02.webp"><img src="assets/pilot-02.webp" width="509" height="338" loading="lazy" alt="Low frontal view of Brandenburg Gate, 500-step masked pilot"></a>
+              <figcaption>500-step masked pilot</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/full-02.webp"><img src="assets/full-02.webp" width="1018" height="677" loading="lazy" alt="Low frontal view of Brandenburg Gate, 12,000-step masked run"></a>
+              <figcaption>12,000-step masked run</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/base-02.webp"><img src="assets/base-02.webp" width="1018" height="677" loading="lazy" alt="Low frontal view of Brandenburg Gate, 12,000-step run with pavement"></a>
+              <figcaption>12,000-step run with pavement</figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="angle">
+          <h4>Steep side angle</h4>
+          <p>The cornice reads as a continuous edge. Fine sculpture outlines remain soft at this angle.</p>
+          <div class="render-grid">
+            <figure>
+              <a href="assets/pilot-03.webp"><img src="assets/pilot-03.webp" width="530" height="390" loading="lazy" alt="Steep side angle of Brandenburg Gate, 500-step masked pilot"></a>
+              <figcaption>500-step masked pilot</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/full-03.webp"><img src="assets/full-03.webp" width="1060" height="781" loading="lazy" alt="Steep side angle of Brandenburg Gate, 12,000-step masked run"></a>
+              <figcaption>12,000-step masked run</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/base-03.webp"><img src="assets/base-03.webp" width="1060" height="781" loading="lazy" alt="Steep side angle of Brandenburg Gate, 12,000-step run with pavement"></a>
+              <figcaption>12,000-step run with pavement</figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="angle">
+          <h4>Sculpture close-up</h4>
+          <p>The horses are easier to separate against the cleared sky.</p>
+          <div class="render-grid">
+            <figure>
+              <a href="assets/pilot-05.webp"><img src="assets/pilot-05.webp" width="517" height="385" loading="lazy" alt="Sculpture close-up of Brandenburg Gate, 500-step masked pilot"></a>
+              <figcaption>500-step masked pilot</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/full-05.webp"><img src="assets/full-05.webp" width="1034" height="771" loading="lazy" alt="Sculpture close-up of Brandenburg Gate, 12,000-step masked run"></a>
+              <figcaption>12,000-step masked run</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/base-05.webp"><img src="assets/base-05.webp" width="1034" height="771" loading="lazy" alt="Sculpture close-up of Brandenburg Gate, 12,000-step run with pavement"></a>
+              <figcaption>12,000-step run with pavement</figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="angle">
+          <h4>Roofline close-up</h4>
+          <p>Edges and relief are visible at this distance, with the smallest marks still indistinct.</p>
+          <div class="render-grid">
+            <figure>
+              <a href="assets/pilot-10.webp"><img src="assets/pilot-10.webp" width="524" height="388" loading="lazy" alt="Roofline close-up of Brandenburg Gate, 500-step masked pilot"></a>
+              <figcaption>500-step masked pilot</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/full-10.webp"><img src="assets/full-10.webp" width="1049" height="777" loading="lazy" alt="Roofline close-up of Brandenburg Gate, 12,000-step masked run"></a>
+              <figcaption>12,000-step masked run</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/base-10.webp"><img src="assets/base-10.webp" width="1049" height="777" loading="lazy" alt="Roofline close-up of Brandenburg Gate, 12,000-step run with pavement"></a>
+              <figcaption>12,000-step run with pavement</figcaption>
+            </figure>
+          </div>
+        </article>
+      </section>
+      <section class="angle-group">
+        <h3>Columns from the sides</h3>
+        <article class="angle">
+          <h4>Left-facing oblique view</h4>
+          <p>The dark openings expose the depth behind the front colonnade.</p>
+          <div class="render-grid">
+            <figure>
+              <a href="assets/pilot-04.webp"><img src="assets/pilot-04.webp" width="495" height="329" loading="lazy" alt="Left-facing oblique view of Brandenburg Gate, 500-step masked pilot"></a>
+              <figcaption>500-step masked pilot</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/full-04.webp"><img src="assets/full-04.webp" width="991" height="659" loading="lazy" alt="Left-facing oblique view of Brandenburg Gate, 12,000-step masked run"></a>
+              <figcaption>12,000-step masked run</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/base-04.webp"><img src="assets/base-04.webp" width="991" height="659" loading="lazy" alt="Left-facing oblique view of Brandenburg Gate, 12,000-step run with pavement"></a>
+              <figcaption>12,000-step run with pavement</figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="angle">
+          <h4>Low oblique view</h4>
+          <p>Column grooves and the ceiling underside come through more clearly.</p>
+          <div class="render-grid">
+            <figure>
+              <a href="assets/pilot-06.webp"><img src="assets/pilot-06.webp" width="541" height="348" loading="lazy" alt="Low oblique view of Brandenburg Gate, 500-step masked pilot"></a>
+              <figcaption>500-step masked pilot</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/full-06.webp"><img src="assets/full-06.webp" width="1082" height="696" loading="lazy" alt="Low oblique view of Brandenburg Gate, 12,000-step masked run"></a>
+              <figcaption>12,000-step masked run</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/base-06.webp"><img src="assets/base-06.webp" width="1082" height="696" loading="lazy" alt="Low oblique view of Brandenburg Gate, 12,000-step run with pavement"></a>
+              <figcaption>12,000-step run with pavement</figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="angle">
+          <h4>Near-corner view</h4>
+          <p>The close corner makes soft edges along the stonework easier to spot.</p>
+          <div class="render-grid">
+            <figure>
+              <a href="assets/pilot-08.webp"><img src="assets/pilot-08.webp" width="520" height="345" loading="lazy" alt="Near-corner view of Brandenburg Gate, 500-step masked pilot"></a>
+              <figcaption>500-step masked pilot</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/full-08.webp"><img src="assets/full-08.webp" width="1040" height="690" loading="lazy" alt="Near-corner view of Brandenburg Gate, 12,000-step masked run"></a>
+              <figcaption>12,000-step masked run</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/base-08.webp"><img src="assets/base-08.webp" width="1040" height="690" loading="lazy" alt="Near-corner view of Brandenburg Gate, 12,000-step run with pavement"></a>
+              <figcaption>12,000-step run with pavement</figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="angle">
+          <h4>Opposite oblique view</h4>
+          <p>The roof stays recognizable from the opposite side, with some soft peripheral geometry.</p>
+          <div class="render-grid">
+            <figure>
+              <a href="assets/pilot-09.webp"><img src="assets/pilot-09.webp" width="524" height="388" loading="lazy" alt="Opposite oblique view of Brandenburg Gate, 500-step masked pilot"></a>
+              <figcaption>500-step masked pilot</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/full-09.webp"><img src="assets/full-09.webp" width="1049" height="777" loading="lazy" alt="Opposite oblique view of Brandenburg Gate, 12,000-step masked run"></a>
+              <figcaption>12,000-step masked run</figcaption>
+            </figure>
+            <figure>
+              <a href="assets/base-09.webp"><img src="assets/base-09.webp" width="1049" height="777" loading="lazy" alt="Opposite oblique view of Brandenburg Gate, 12,000-step run with pavement"></a>
+              <figcaption>12,000-step run with pavement</figcaption>
+            </figure>
+          </div>
+        </article>
+      </section>
+    </section>
+    <section class="study next" aria-labelledby="next-title">
+      <div>
+        <h2 id="next-title">What we’re checking next</h2>
+        <p>The next Gate comparison will look for a continuous base, legible relief where the photos resolve it, and fewer stray splats from the front and oblique angles.</p>
+      </div>
+      <figure>
+        <a href="assets/column-detail.webp"><img src="assets/column-detail.webp" loading="lazy" alt="Oblique reconstruction of the columns and underside of the gate"></a>
+        <figcaption>Oblique held-out view used to check columns and roof detail.</figcaption>
+      </figure>
+    </section>
+    <section class="study" id="reichstag" aria-labelledby="reichstag-title">
+      <h2 id="reichstag-title">Reichstag</h2>
+      <p>This 500-step unmasked pilot trained on 60 photos. It recovered the broad facade, window rows, and dome across seven held-out views. The grass and sky dominate the softer parts of the render.</p>
+      <div class="render-grid">
+        <figure><a href="assets/reichstag-00.webp"><img src="assets/reichstag-00.webp" loading="lazy" alt="Reichstag full facade in the pilot with a blurred lawn"></a><figcaption>Full facade</figcaption></figure>
+        <figure><a href="assets/reichstag-02.webp"><img src="assets/reichstag-02.webp" loading="lazy" alt="Closer pilot render of Reichstag's entry and columns"></a><figcaption>Entry and columns</figcaption></figure>
+        <figure><a href="assets/reichstag-04.webp"><img src="assets/reichstag-04.webp" loading="lazy" alt="Reichstag's central dome and window rows in the pilot"></a><figcaption>Dome and window rows</figcaption></figure>
+      </div>
+    </section>
+  </main>
+  <footer class="shell">PhotoTourism IMC-PT 2020 · NeRF-W split · Reconstructed with <a href="https://github.com/harry7557558/spirula-studio">Spirula Studio</a></footer>
+</body>
+</html>
