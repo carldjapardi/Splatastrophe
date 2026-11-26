@@ -1,0 +1,141 @@
+diff --git a/src/model/dbw.py b/src/model/dbw.py
+index 2c5f1c4..aae4d0f 100644
+--- a/src/model/dbw.py
++++ b/src/model/dbw.py
+@@ -207,6 +207,9 @@ class DifferentiableBlocksWorld(nn.Module):
+ 
+     def predict(self, inp, labels, w_edges=False, filter_transparent=False):
+         B, gt, R_tgt, T_tgt = len(inp['imgs']), inp['imgs'], inp['R'], inp['T']
++        # Per-view intrinsics: datasets like PhotoTourism have a different K for every image, so pass each batch's
++        # K to every render call. The first batch's K is still stored on the cameras as the default for viz code.
++        kw_K = {'K': inp['K']} if 'K' in inp else {}
+         if 'K' in inp and self.renderer.cameras.K is None:
+             self.renderer.update_cameras(device=gt.device, K=inp['K'][0:1])
+             self.renderer_fine.update_cameras(device=gt.device, K=inp['K'][0:1])
+@@ -219,12 +222,12 @@ class DifferentiableBlocksWorld(nn.Module):
+         self._blocks_alpha = None
+         if self.decouple_rendering:
+             env = join_meshes_as_scene([self.build_bkg(world_coord=True), self.build_ground(world_coord=True)])
+-            rec_env = self.renderer_env(env.extend(B), R=R_tgt, T=T_tgt).split([3, 1], dim=1)[0]
++            rec_env = self.renderer_env(env.extend(B), R=R_tgt, T=T_tgt, **kw_K).split([3, 1], dim=1)[0]
+             blocks = self.build_blocks(filter_transparent=filter_tsp, as_scene=True)
+             if len(blocks) > 0:
+                 # if filter_transparent, no need to render with smooth opacities
+                 alpha = None if filter_tsp else self._alpha.repeat_interleave(self.BNF).repeat(B)
+-                rec_fg, mask = renderer(blocks.extend(B), R=R_tgt, T=T_tgt, faces_alpha=alpha).split([3, 1], dim=1)
++                rec_fg, mask = renderer(blocks.extend(B), R=R_tgt, T=T_tgt, faces_alpha=alpha, **kw_K).split([3, 1], dim=1)
+             else:
+                 rec_fg, mask = torch.zeros_like(rec_env), torch.zeros_like(rec_env)[:, :1]
+             rec = rec_fg * mask + (1 - mask) * rec_env
+@@ -237,20 +240,21 @@ class DifferentiableBlocksWorld(nn.Module):
+                 alpha = torch.cat([alpha_env, self._alpha.repeat_interleave(self.BNF)], dim=0).repeat(B)
+             else:
+                 alpha = None
+-            rec, mask = renderer(scene.extend(B), R=R_tgt, T=T_tgt, faces_alpha=alpha).split([3, 1], dim=1)
++            rec, mask = renderer(scene.extend(B), R=R_tgt, T=T_tgt, faces_alpha=alpha, **kw_K).split([3, 1], dim=1)
+ 
+         if w_edges:
+             if self.decouple_rendering:
+                 scene = join_meshes_as_scene([env, blocks]) if len(blocks) > 0 else env
+             colors = self.get_scene_face_colors(filter_transparent=filter_tsp).repeat(B, 1)
+-            rec = renderer.draw_edges(rec, scene.extend(B), R_tgt, T_tgt, colors=colors)
++            rec = renderer.draw_edges(rec, scene.extend(B), R_tgt, T_tgt, colors=colors, **kw_K)
+         return rec
+ 
+     def predict_synthetic(self, inp, labels):
+         B, R_tgt, T_tgt = len(inp['imgs']), inp['R'], inp['T']
++        kw_K = {'K': inp['K']} if 'K' in inp else {}
+         blocks = self.build_blocks(filter_transparent=True, synthetic_colors=True, as_scene=True)
+         if len(blocks) > 0:
+-            rec = self.renderer_light(blocks.extend(B), R=R_tgt, T=T_tgt, viz_purpose=True)[:, :3]
++            rec = self.renderer_light(blocks.extend(B), R=R_tgt, T=T_tgt, viz_purpose=True, **kw_K)[:, :3]
+         else:
+             rec = torch.ones_like(inp['imgs'])
+         return rec
+@@ -492,7 +496,8 @@ class DifferentiableBlocksWorld(nn.Module):
+             inp = torch_to(inp, device)
+             imgs, N = inp['imgs'], len(inp['imgs'])
+             if hard_inference:
+-                rec = self.renderer(scene.extend(N), inp['R'], inp['T'], viz_purpose=True)[:, :3]
++                rec = self.renderer(scene.extend(N), inp['R'], inp['T'], viz_purpose=True,
++                                    **({'K': inp['K']} if 'K' in inp else {}))[:, :3]
+             else:
+                 rec = self.predict(inp, labels, filter_transparent=True)
+             losses = self.compute_losses(imgs, rec)
+@@ -556,13 +561,15 @@ class DifferentiableBlocksWorld(nn.Module):
+                 img = img_src[k]
+                 convert_to_img(img).save(path / f'{i}_inp.png')
+                 R, T = R_src[k:k+1], T_src[k:k+1]
+-                rec = renderer(meshes, R, T, viz_purpose=True)[:, :3]
++                kw_K = {'K': inp['K'][k:k+1]} if 'K' in inp else {}
++                rec = renderer(meshes, R, T, viz_purpose=True, **kw_K)[:, :3]
+                 convert_to_img(rec).save(path / f'{i}_rec.png')
+-                convert_to_img(renderer.draw_edges(rec, syn_blocks, R, T, colors)).save(path / f'{i}_rec_col.png')
+-                convert_to_img(renderer.draw_edges(img, syn_blocks, R, T, colors)).save(path / f'{i}_rec_col_inp.png')
+-                rec = renderer_light(syn_blocks, R, T, viz_purpose=True)[:, :3]
++                convert_to_img(renderer.draw_edges(rec, syn_blocks, R, T, colors, **kw_K)).save(path / f'{i}_rec_col.png')
++                convert_to_img(renderer.draw_edges(img, syn_blocks, R, T, colors, **kw_K)).save(path / f'{i}_rec_col_inp.png')
++                rec = renderer_light(syn_blocks, R, T, viz_purpose=True, **kw_K)[:, :3]
+                 convert_to_img(rec).save(path / f'{i}_rec_syn_nobkg.png')
+-                rec_wedges = renderer_light.draw_edges(rec, syn_blocks, R, T, linewidth=0.7, colors=(0.3, 0.3, 0.3))
++                rec_wedges = renderer_light.draw_edges(rec, syn_blocks, R, T, linewidth=0.7, colors=(0.3, 0.3, 0.3),
++                                                       **kw_K)
+                 convert_to_img(rec_wedges).save(path / f'{i}_rec_syn_nobkg_edged.png')
+                 R, T = R @ R_traj, T.expand(NV, -1)
+                 save_trajectory_as_video(meshes, path / f'{i}_rec_traj.mp4', R=R, T=T, renderer=renderer)
+diff --git a/src/model/renderer.py b/src/model/renderer.py
+index 208afcd..f13a6d9 100644
+--- a/src/model/renderer.py
++++ b/src/model/renderer.py
+@@ -81,7 +81,16 @@ class Renderer(nn.Module):
+     def init_kwargs(self):
+         return deepcopy(self._init_kwargs)
+ 
++    def cameras_for(self, K):
++        """Copy of the cameras with a batch of intrinsics K (N44), one per rendered view."""
++        return self.get_copy_cameras(K=K, device=K.device)
++
+     def forward(self, meshes, R, T, viz_purpose=False, **kwargs):
++        if kwargs.get('K') is not None:
++            # per-view intrinsics: pytorch3d checks a per-call K against the camera batch size, so build a camera
++            # batch with these K and pass it to the rasterizer and shader
++            kwargs['cameras'] = self.cameras_for(kwargs.pop('K'))
++        kwargs.pop('K', None)
+         # XXX bug when using perspective_correct, see https://github.com/facebookresearch/pytorch3d/issues/561
+         # setting eps fixes the issue
+         if isinstance(self.lights, DirectionalLights):
+@@ -132,10 +141,13 @@ class Renderer(nn.Module):
+         self.lights.specular_color = self.lights._specular_color
+ 
+     @torch.no_grad()
+-    def render_edges(self, meshes, R, T, image_size=None, linewidth=1, return_pix2face=False, faces_per_pixel=1):
++    def render_edges(self, meshes, R, T, image_size=None, linewidth=1, return_pix2face=False, faces_per_pixel=1,
++                     **kwargs):
+         image_size = image_size or self.img_size
++        K = kwargs.pop('K', None)
++        cameras = self.cameras if K is None else self.cameras_for(K)
+         raster_settings = RasterizationSettings(image_size=image_size, faces_per_pixel=faces_per_pixel, **self.r_kwargs)
+-        fragments = MeshRasterizer(self.cameras, raster_settings)(meshes, R=R, T=T, eps=EPS)
++        fragments = MeshRasterizer(cameras, raster_settings)(meshes, R=R, T=T, eps=EPS, **kwargs)
+         # dist is the signed squared distance in NDC space i.e. [-1, 1] for the smallest length,
+         # the pixel size along the smallest length in NDC is thus 2 / min(image_size)
+         mask = (-fragments.dists < (linewidth * 2 / min(image_size)) ** 2).float()[:, None]  # B1HWK
+@@ -145,7 +157,7 @@ class Renderer(nn.Module):
+         else:
+             return mask
+ 
+-    def draw_edges(self, img, meshes, R=None, T=None, colors=None, linewidth=1, antialias=True):
++    def draw_edges(self, img, meshes, R=None, T=None, colors=None, linewidth=1, antialias=True, **kwargs):
+         if R is None:
+             R = torch.eye(3, device=meshes.device)[None].expand(len(meshes), -1, -1)
+         if T is None:
+@@ -159,7 +171,8 @@ class Renderer(nn.Module):
+         if isinstance(colors, (list, tuple)):
+             colors = torch.Tensor(colors)
+ 
+-        mask, pix2face = self.render_edges(meshes, R, T, image_size=img_size, linewidth=linewidth, return_pix2face=True)
++        mask, pix2face = self.render_edges(meshes, R, T, image_size=img_size, linewidth=linewidth, return_pix2face=True,
++                                           **kwargs)
+         if len(colors.shape) == 2:
+             face_img = colors[pix2face].permute(0, 3, 1, 2)  # one color per face
+         else:
