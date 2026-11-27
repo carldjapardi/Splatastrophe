@@ -67,3 +67,4 @@ footer { border-top: 1px solid var(--rule); padding-block: 1.25rem 2.5rem; color
 .scores caption { text-align: left; color: var(--muted); margin-bottom: .5rem; }
 .scores th, .scores td { padding: .6rem .5rem; border-bottom: 1px solid var(--rule); text-align: left; }
 .scores td { white-space: nowrap; }
+.benchmark-orbit video { display: block; width: 100%; height: auto; background: #111510; }

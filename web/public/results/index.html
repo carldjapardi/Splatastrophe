@@ -37,19 +37,37 @@
     </section>
     <section class="study" id="astra-benchmark" aria-labelledby="astra-title">
       <h2 id="astra-title">Can Astra reconstruct a landmark on its own?</h2>
-      <p>We plan to give Codex with GPT‑6.2 Astra a folder of landmark photos and a fixed GPU budget. Astra will choose and run its own tools for camera alignment, splat reconstruction, and export. We’ll compare its export with one produced by our finalized reconstruction pipeline. The end-to-end benchmark is pending.</p>
+      <p>We gave Codex with GPT‑6.2 Astra 96 Taj Mahal photos. Astra chose and ran its own tools for camera alignment, splat reconstruction, and export. We also ran a controlled comparison on the Apple M4 GPU with the same training photos, camera calibration, and sparse seed available to both workflows.</p>
       <div class="comparison benchmark-arms">
         <div>
           <h3>Our finalized pipeline</h3>
-          <p>Freeze the team’s camera, training, cleanup, and export settings before running the comparison.</p>
+          <p>Supplied COLMAP camera calibration and sparse geometry, followed by 2,000 full-resolution Spirula steps.</p>
         </div>
         <div>
           <h3>Astra’s autonomous run</h3>
-          <p>Give Astra the same photos and export requirements. Record its tool choices, retries, and any human intervention.</p>
+          <p>COLMAP registration in the photo-only run. For the calibrated run, Astra seeded additional surface points and trained a custom PyTorch splat optimizer using sampled image patches.</p>
         </div>
       </div>
-      <p>Both runs use the same training photos, GPU type and budget, and export requirements. We’ll render both at the same resolution from held-out viewpoints, score PSNR and SSIM, and inspect a full orbit for gaps, floating splats, and softened details. We’ll also report runtime, GPU spend, and the exported file size.</p>
-      <p>For the rear-view test, we’ll withhold a rear sector from a capture that has real photos all the way around. Both runs get the same reduced photo set. We’ll compare any synthesized surfaces with the reserved rear photos.</p>
+      <h3>Calibrated Taj Mahal comparison</h3>
+      <p>We rendered both exports at the same 21 held-out cameras. Both workflows used calibration from a prior reconstruction. The held-out image pixels were reserved for evaluation. <a href="https://megascenes.github.io/">MegaScenes dataset</a></p>
+      <table class="scores">
+        <caption>Mean scores on 21 held-out photos</caption>
+        <thead><tr><th scope="col">Workflow</th><th scope="col">PSNR</th><th scope="col">SSIM</th><th scope="col">Training time</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Team pipeline</th><td>13.67 dB</td><td>0.606</td><td>3m 40s</td></tr>
+          <tr><th scope="row">Astra</th><td>7.85 dB</td><td>0.329</td><td>38s</td></tr>
+        </tbody>
+      </table>
+      <p>The team ran 2,000 full-resolution steps. Astra sampled 2,000 patches and made 1,834 optimizer updates. Training time starts after camera and seed preparation. This pilot measures the quality and time of these two runs.</p>
+      <figure class="benchmark-orbit">
+        <video controls playsinline preload="none" width="1440" height="480" poster="assets/taj-astra-orbit.webp" aria-label="Side-by-side Taj Mahal orbit with the team pipeline on the left and Astra on the right">
+          <source src="assets/taj-astra-orbit.mp4" type="video/mp4">
+          <a href="assets/taj-astra-orbit.mp4">Download the orbit comparison</a>
+        </video>
+        <figcaption>Team pipeline on the left and Astra on the right, rendered along the same 24-camera orbit. The team retains more detail around the arches and minarets. Both exports show gaps and haze.</figcaption>
+      </figure>
+      <h3>Photo-only registration</h3>
+      <p>The 96 photos span eight directions. Astra registered 92 photos and exported 95,000 splats. The team’s photo-only COLMAP control registered 95. Both solutions had about 90° median orientation error after alignment to the reference cameras, so the photo-only comparison stopped at that check. The rear-sector withholding test is still pending.</p>
       <h3>Taj Mahal camera-pose pilot</h3>
       <p>This earlier test changed only the training camera poses. Both Spirula runs used 32 training photos, 1,200 steps, and the same 21 held-out views. The VGGT-1B run used feed-forward poses without bundle adjustment.</p>
       <table class="scores">
