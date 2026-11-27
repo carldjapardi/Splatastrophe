@@ -1,0 +1,74 @@
+{
+  "issue": 41,
+  "date": "2026-11-26",
+  "stage": "development pilot",
+  "data": {
+    "source": "https://megascenes.github.io/",
+    "scene": "Taj Mahal 113/197 component 0",
+    "training_images": 96,
+    "training_sectors": 8,
+    "largest_selected_training_camera_gap_deg": 19.7,
+    "held_out_images": 21,
+    "split_manifest_sha256": "0cb1134f0e61087022875bf7e56b5faf3ebdb0b52beb7571fc6e25a8c6b4a320",
+    "scale": "uncalibrated SfM units"
+  },
+  "calibration": {
+    "source": "Supplied MegaScenes COLMAP poses and SIMPLE_RADIAL intrinsics, converted to OpenGL camera-to-world transforms.",
+    "shared_seed_points": 25616,
+    "seed_policy": "Keep sparse points tracked by at least two selected training photos.",
+    "limitation": "The upstream MegaScenes camera fit used registered evaluation photos; the evaluated image pixels were not sent into either appearance training run."
+  },
+  "hardware": {
+    "training": "Apple M4 integrated GPU for both runs, sequentially",
+    "remote": "Thunder L40 restored, verified and deleted. Automatic permission review rejected uploading the photos, pose data, and training script. Neither reconstruction ran on Thunder.",
+    "quoted_thunder_rate_usd_per_hour": 0.87,
+    "thunder_billed_amount": "unverified",
+    "original_snapshots_verified_ready_after_deletion": true
+  },
+  "photo_only_registration": {
+    "team": {
+      "matched_training_cameras": 95,
+      "inliers": 28,
+      "median_rotation_deg": 90.42134530628833,
+      "center_median_percent_of_radius": 266.19932992125104
+    },
+    "astra": {
+      "matched_training_cameras": 92,
+      "inliers": 26,
+      "median_rotation_deg": 89.95938308227989,
+      "center_median_percent_of_radius": 194.66349599238876
+    }
+  },
+  "photo_only_result": "Minimum alignment gate failed for both photo-only camera solutions. Shared held-out render scores were withheld.",
+  "calibrated_team": {
+    "workflow": "Spirula Studio v2026.11.12, 2,000 full-resolution in-the-wild steps, cap 500,000, scene-center none, supplied cameras and seed.",
+    "psnr_db": 13.6652,
+    "ssim": 0.606164,
+    "held_out_views": 21,
+    "training_elapsed_seconds": 219.992,
+    "splats": 98847,
+    "ply_bytes": 24515586,
+    "ply_sha256": "93ae9312953051093728fb8386645e2a515cbc0d610563512c61b7f3ce6a7350"
+  },
+  "calibrated_astra": {
+    "workflow": "Codex GPT-6.2 Astra independently chose PyTorch 2.15.0 MPS optimization, 60,000 extra image-derived seeds, 2,000 patch draws and 1,834 optimizer updates.",
+    "psnr_db": 7.85212,
+    "ssim": 0.328725,
+    "held_out_views": 21,
+    "training_elapsed_seconds": 37.6323,
+    "splats": 85616,
+    "ply_bytes": 21234298,
+    "ply_sha256": "9ae14c186ea581b8d732f3646462a564428b963d386c31ea38bcf2e72d1b3983"
+  },
+  "evaluation": "Identical supplied held-out cameras, image dimensions and image bytes. Both PLYs rendered by Spirula Studio v2026.11.12 at zero optimization steps. Mean full-image PSNR and SSIM before compression or cleanup.",
+  "scope": "Compare the observed quality and elapsed training time under supplied calibration. Full-frame steps and patch updates consume different compute. The missing rear-sector condition remains pending.",
+  "orbit": {
+    "camera_poses": 24,
+    "increment_deg": 15,
+    "radius_sfm_units": 3.31,
+    "same_camera_path_for_both": true,
+    "observations": "The team run retains arch and minaret detail with haze and missing ground. Astra has broad translucent splats and less defined dome and facade. Both show gaps during the orbit.",
+    "video": "web/public/results/assets/taj-astra-orbit.mp4",
+    "scores": "Novel orbit views have no reference photos. Only the 21 real held-out cameras contributed to the reported scores."
+  }
+}
