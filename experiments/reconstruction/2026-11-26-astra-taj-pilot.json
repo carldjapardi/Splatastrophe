@@ -14,7 +14,7 @@
   },
   "calibration": {
     "source": "Supplied MegaScenes COLMAP poses and SIMPLE_RADIAL intrinsics, converted to OpenGL camera-to-world transforms.",
-    "shared_seed_splats": 25616,
+    "shared_seed_points": 25616,
     "seed_policy": "Keep sparse points tracked by at least two selected training photos.",
     "limitation": "The upstream MegaScenes camera fit used registered evaluation photos; the evaluated image pixels were not sent into either appearance training run."
   },
